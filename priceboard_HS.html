@@ -369,41 +369,43 @@ function detectCat(name) {
 // ════════════════════════════════════════
 function normalizeModel(raw) {
   let s = raw.toUpperCase().trim();
-
-  // Strip paréntesis y su contenido: (esim), (sim + esim), (open box), etc.
+  s = s.replace(/["']/g, '');
   s = s.replace(/\s*\([^)]*\)/g, '').trim();
-
-  // Strip emojis y símbolos residuales
-  s = s.replace(/[^ -~]/g, '').trim();
-
-  // Strip marcadores de condición al final
-  s = s.replace(/\s*(NEW|ACTIVATED|OPEN BOX|SIN PRECINTOS|EUROPEO|REBAJA)\s*$/i, '').trim();
-
-  // Normalizar espacios
+  s = s.replace(/[^\x20-\x7E]/g, '').trim();
+  s = s.replace(/\s*(NEW|ACTIVATED|OPEN BOX|SIN PRECINTOS|EUROPEO|REBAJA|SIM\s*\+\s*ESIM|ESIM|ONLY ESIM)\s*$/i, '').trim();
   s = s.replace(/\s+/g, ' ').trim();
 
   // ── iPhone ──
-  // "IPHONE 16 E" → "IPHONE 16E"
-  s = s.replace(/IPHONE\s+(\d+)\s+E/, 'IPHONE $1E');
-  // "IPHONE16E" → "IPHONE 16E" (sin espacio entre marca y número)
-  s = s.replace(/IPHONE(\d+)/, 'IPHONE $1');
-  // Normalizar sufijos
-  s = s.replace(/PRO\s+MAX/, 'PRO MAX');
-  s = s.replace(/PRO MAX/, 'PRO MAX');
-  s = s.replace(/PLUS/, 'PLUS');
-  s = s.replace(/ULTRA/, 'ULTRA');
+  s = s.replace(/IPHONE\s*(\d+)\s*E\b/, 'IPHONE $1E');
+  s = s.replace(/IPHONE(\d)/, 'IPHONE $1');
+  s = s.replace(/\bPRO\s*MAX\b/g, 'PRO MAX');
 
   // ── Samsung ──
-  // "S26 PLUS" → "SAMSUNG S26 PLUS" si no tiene prefijo
+  // Caso "SM - S938B/DS 12GB S25 ULTRA 512GB BLACK" → extraer modelo del interior
+  const smInternal = s.match(/\bS(\d{2})\b\s*(ULTRA|PLUS|FE|EDGE|[A-Z]+)?/g);
+  if (/^SM\s*[-–]/.test(s) && smInternal) {
+    // Buscar el modelo real (S25, S26, etc.) que no sea el número de serie
+    for (const m of smInternal) {
+      const nm2 = m.match(/S(\d{2})\s*(ULTRA|PLUS|FE|EDGE)?/);
+      if (nm2 && parseInt(nm2[1]) >= 20) {
+        s = 'SAMSUNG S' + nm2[1] + (nm2[2] ? ' ' + nm2[2] : '');
+        break;
+      }
+    }
+  }
+  // Quitar storage y RAM del nombre Samsung: "256GB 12GB/256GB", "12GB/512GB"
+  s = s.replace(/\s+\d+\s*GB\s*\/\s*\d+\s*(GB|TB)/gi, '');
+  s = s.replace(/\s+\d+\s*(GB|TB)(?=\s|$)/gi, '');
+  // "S26 PLUS" sin prefijo
   if (/^S\d{2}/.test(s) && !/^SAMSUNG/.test(s)) s = 'SAMSUNG ' + s;
-  // "GALAXY S26" → "SAMSUNG S26"
   s = s.replace(/^GALAXY\s+/, 'SAMSUNG ');
 
   // ── Google ──
   s = s.replace(/^GOOGLE\s+PIXEL/, 'PIXEL');
 
-  return s.trim();
+  return s.replace(/\s+/g, ' ').trim();
 }
+
 
 function parseCSVLine(line) {
   const res=[]; let cur='', inQ=false;
@@ -463,7 +465,7 @@ function parseSheetCSV(csvText, sheetName) {
 
       if (!model) continue;
       const status = (col3||'STK').toUpperCase().trim();
-      items.push({id:uid(),provider:'SHEET',sheetName,category:detectCat(model),model:model.replace(/\s+/g,' ').trim(),storage,ram,price,currency:'USD',colors,status:status==='NO'?'NO':status==='ING'?'ING':'STK',notes:''});
+      items.push({id:uid(),provider:'SHEET',sheetName,category:detectCat(model),model:normalizeModel(model),storage,ram,price,currency:'USD',colors,status:status==='NO'?'NO':status==='ING'?'ING':'STK',notes:''});
     } else if (!col2) {
       currentModel = col1.toUpperCase().trim();
     }
