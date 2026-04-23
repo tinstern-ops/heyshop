@@ -180,6 +180,12 @@ tr.best .pv{color:var(--best-text);font-weight:700;}
 .finput:focus,.fselect:focus{border-color:var(--accent);}
 .fselect{cursor:pointer;}
 
+.bat{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;}
+.bat-100{color:#16a34a;background:#dcfce7;border:1px solid #86efac;}
+.bat-90{color:#65a30d;background:#ecfccb;border:1px solid #bef264;}
+.bat-80{color:#d97706;background:#fef3c7;border:1px solid #fde68a;}
+.bat-low{color:#dc2626;background:#fee2e2;border:1px solid #fca5a5;}
+.qual{font-size:11px;font-weight:600;color:var(--muted);}
 ::-webkit-scrollbar{width:3px;height:3px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
@@ -215,6 +221,7 @@ tr.best .pv{color:var(--best-text);font-weight:700;}
   <button class="tab" onclick="showTab('airpods',this)">🎧 AirPods</button>
   <button class="tab" onclick="showTab('laptop',this)">🖥 Laptops</button>
   <button class="tab" onclick="showTab('acc',this)">🔌 Accesorios</button>
+  <button class="tab" onclick="showTab('usado',this)">♻️ Usados</button>
   <button class="tab admin-tab" id="adminTab" style="display:none" onclick="showTab('admin',this)">⚙️ Admin</button>
 </div>
 
@@ -286,12 +293,21 @@ tr.best .pv{color:var(--best-text);font-weight:700;}
     </div>
     <div id="wrap-acc"></div>
   </div>
+  <!-- USADOS -->
+  <div id="sec-usado" class="sec">
+    <div class="bar">
+      <select id="fu-model" onchange="renderUsado()"><option value="">Todos los modelos</option></select>
+      <select id="fu-prov" onchange="renderUsado()"><option value="">Todos los proveedores</option></select>
+    </div>
+    <div id="wrap-usado"></div>
+  </div>
   <!-- ADMIN -->
   <div id="sec-admin" class="sec">
     <div class="admin-wrap">
       <div class="info-box">Pegá los mensajes de WhatsApp de cada proveedor y guardá. Los datos se publican en el Gist y todos los vendedores los ven al actualizar.</div>
+      <!-- NUEVOS -->
       <div class="carga-sec">
-        <h2>📱 Mensajes de WhatsApp</h2>
+        <h2>📱 Nuevos — Mensajes de WhatsApp</h2>
         <div class="carga-grid">
           <div class="card">
             <h3><span class="pb ps">SVET</span></h3>
@@ -302,6 +318,33 @@ tr.best .pv{color:var(--best-text);font-weight:700;}
             <h3><span class="pb pj">JULIÁN</span></h3>
             <p>Mensaje completo de JULIÁN</p>
             <textarea id="txt-julian" placeholder="Pegá el mensaje completo de JULIÁN…"></textarea>
+          </div>
+          <div class="card">
+            <h3 style="gap:6px">
+              <span class="pb psh">Nuevo proveedor</span>
+            </h3>
+            <p>Nombre del proveedor y mensaje</p>
+            <input class="finput" id="txt-nuevo-nombre" placeholder="Nombre del proveedor (ej: MARCOS)" style="margin-bottom:6px">
+            <textarea id="txt-nuevo" placeholder="Pegá el mensaje del proveedor…" style="height:120px"></textarea>
+          </div>
+        </div>
+      </div>
+      <!-- USADOS -->
+      <div class="carga-sec">
+        <h2>♻️ Usados — Mensajes de WhatsApp</h2>
+        <div id="usado-cards" class="carga-grid">
+          <div class="card">
+            <h3><span class="pb ptc">TECNOCITY</span></h3>
+            <p>Lista de usados de Tecnocity</p>
+            <textarea id="txt-tecnocity" placeholder="Pegá el listado de usados de Tecnocity…"></textarea>
+          </div>
+          <div class="card">
+            <h3 style="gap:6px">
+              <span class="pb ptb">Nuevo proveedor usado</span>
+            </h3>
+            <p>Nombre y lista</p>
+            <input class="finput" id="txt-usado-nombre" placeholder="Nombre del proveedor (ej: TECBOX)" style="margin-bottom:6px">
+            <textarea id="txt-usado-nuevo" placeholder="Pegá el listado de usados…" style="height:120px"></textarea>
           </div>
         </div>
       </div>
@@ -370,6 +413,16 @@ const ORDER_IP = [
   'IPHONE 16E','IPHONE 16','IPHONE 16 PLUS','IPHONE 16 PRO','IPHONE 16 PRO MAX',
   'IPHONE 17E','IPHONE 17','IPHONE 17 PLUS','IPHONE 17 PRO','IPHONE 17 PRO MAX',
 ];
+const ORDER_IP_USADO = [
+  'iPhone 11','iPhone 11 Pro','iPhone 11 Pro Max',
+  'iPhone 12','iPhone 12 Mini','iPhone 12 Pro','iPhone 12 Pro Max',
+  'iPhone 13','iPhone 13 Mini','iPhone 13 Pro','iPhone 13 Pro Max',
+  'iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max',
+  'iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max',
+  'iPhone 16E','iPhone 16','iPhone 16 Plus','iPhone 16 Pro','iPhone 16 Pro Max',
+  'iPhone 17E','iPhone 17','iPhone 17 Plus','iPhone 17 Pro','iPhone 17 Pro Max',
+];
+
 const ORDER_SAM = [
   'SAMSUNG S24 FE','SAMSUNG S24','SAMSUNG S24 PLUS','SAMSUNG S24 ULTRA',
   'SAMSUNG S25 FE','SAMSUNG S25','SAMSUNG S25 PLUS','SAMSUNG S25 ULTRA',
@@ -448,6 +501,7 @@ const CAT_MAP = {
   airpods: l => l.category === 'AirPods',
   laptop: l => l.category === 'Laptop',
   acc: l => l.category === 'Accesorio',
+  usado: l => l.condition === 'used',
 };
 
 // ═══════════════════════════════════════
@@ -538,6 +592,71 @@ function detectCat(name) {
   if (/MACBOOK/.test(u)) return 'Mac';
   if (/LENOVO|ASUS|HP |ACER|MSI|DELL|LAPTOP|NOTEBOOK/.test(u)) return 'Laptop';
   return 'Accesorio';
+}
+
+// ═══════════════════════════════════════
+// PARSER USADOS (por % de batería)
+// ═══════════════════════════════════════
+const USADO_MODEL_RE = [
+  [/IPHONE\s*17\s*PRO\s*MAX/i,'iPhone 17 Pro Max'],[/IPHONE\s*17\s*PRO\b/i,'iPhone 17 Pro'],
+  [/IPHONE\s*17E/i,'iPhone 17E'],[/IPHONE\s*17\b/i,'iPhone 17'],
+  [/IPHONE\s*16\s*PRO\s*MAX/i,'iPhone 16 Pro Max'],[/IPHONE\s*16\s*PRO\b/i,'iPhone 16 Pro'],
+  [/IPHONE\s*16E/i,'iPhone 16E'],[/IPHONE\s*16\b/i,'iPhone 16'],
+  [/IPHONE\s*15\s*PRO\s*MAX/i,'iPhone 15 Pro Max'],[/IPHONE\s*15\s*PRO\b/i,'iPhone 15 Pro'],
+  [/IPHONE\s*15\b/i,'iPhone 15'],
+  [/IPHONE\s*14\s*PRO\s*MAX/i,'iPhone 14 Pro Max'],[/IPHONE\s*14\s*PRO\b/i,'iPhone 14 Pro'],
+  [/IPHONE\s*14\b/i,'iPhone 14'],
+  [/IPHONE\s*13\s*PRO\s*MAX/i,'iPhone 13 Pro Max'],[/IPHONE\s*13\s*PRO\b/i,'iPhone 13 Pro'],
+  [/IPHONE\s*13\s*MINI/i,'iPhone 13 Mini'],[/IPHONE\s*13\b/i,'iPhone 13'],
+  [/IPHONE\s*12\s*PRO\s*MAX/i,'iPhone 12 Pro Max'],[/IPHONE\s*12\s*PRO\b/i,'iPhone 12 Pro'],
+  [/IPHONE\s*12\s*MINI/i,'iPhone 12 Mini'],[/IPHONE\s*12\b/i,'iPhone 12'],
+  [/IPHONE\s*11\s*PRO\s*MAX/i,'iPhone 11 Pro Max'],[/IPHONE\s*11\s*PRO\b/i,'iPhone 11 Pro'],
+  [/IPHONE\s*11\b/i,'iPhone 11'],
+];
+
+function parseUsadoText(text, prov) {
+  const items = [];
+  const lines = text.split('\n');
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    // Detectar modelo
+    let model = null;
+    for (const [re, name] of USADO_MODEL_RE) {
+      if (re.test(line)) { model = name; break; }
+    }
+    if (!model) continue;
+    // Storage
+    const storM = line.match(/(\d+)\s*(GB|TB)/i);
+    if (!storM) continue;
+    const storage = storM[1] + storM[2].toUpperCase();
+    // Precio: U$S170, U$S285, U$440
+    const priceM = line.match(/U\$S?\s*(\d+)/i);
+    if (!priceM) continue;
+    const price = parseInt(priceM[1]);
+    // Batería: +70%, 100%, +80/85%
+    const batM = line.match(/\+?(\d{2,3}(?:\/\d{2,3})?)\s*%/);
+    const battery = batM ? batM[0].trim() : '';
+    // Calidad: (A/A+), (A), (A-)
+    let quality = '';
+    const qualM = line.match(/\(([A-Za-z][^)]{0,15})\)/g);
+    if (qualM) {
+      for (const q of qualM) {
+        const inner = q.slice(1,-1).trim();
+        if (/^A[\+\-\/A\+\s]*$/i.test(inner.replace(/\s/g,''))) { quality = inner; break; }
+      }
+    }
+    // Nota
+    const noteM = line.match(/\(([^)]*(?:bordes|marcad|like new|gtia|garantia|sellad|activat|cpo)[^)]*)\)/i);
+    const note = noteM ? noteM[1].trim() : '';
+
+    items.push({
+      id: uid(), provider: prov, sheetName: '', condition: 'used',
+      category: 'iPhone', model, storage, ram: '', price, currency: 'USD',
+      colors: [], status: 'ok', battery, quality, note,
+    });
+  }
+  return items;
 }
 
 // ═══════════════════════════════════════
@@ -749,6 +868,11 @@ function buildFilters() {
   });
   const macModels=[...new Set(listings.filter(CAT_MAP.mac).map(l=>l.model))].sort();
   fillSelect('fm-model',macModels,'Todos los modelos');
+  // Usados
+  const usadoModels=[...new Set(listings.filter(CAT_MAP.usado).map(l=>l.model))].sort((a,b)=>ORDER_IP_USADO.indexOf(a)-ORDER_IP_USADO.indexOf(b));
+  const usadoProvs=[...new Set(listings.filter(CAT_MAP.usado).map(l=>l.provider))].sort();
+  fillSelect('fu-model',usadoModels,'Todos los modelos');
+  fillSelect('fu-prov',usadoProvs,'Todos los proveedores');
 }
 
 // ═══════════════════════════════════════
@@ -817,6 +941,75 @@ function renderCatTable(cat, data, keyFn, sortFn, cols) {
   wrap.innerHTML=html;
 }
 
+function batClass(bat) {
+  if (!bat) return '';
+  const n = parseInt(bat.match(/\d+/)?.[0] || '0');
+  if (n >= 100) return 'bat-100';
+  if (n >= 90)  return 'bat-90';
+  if (n >= 80)  return 'bat-80';
+  return 'bat-low';
+}
+
+function renderUsado() {
+  const fm = document.getElementById('fu-model').value;
+  const fp = document.getElementById('fu-prov').value;
+  let data = listings.filter(CAT_MAP.usado);
+  if (fm) data = data.filter(l => l.model === fm);
+  if (fp) data = data.filter(l => l.provider === fp);
+  if (searchQ) {
+    const q = searchQ.toLowerCase();
+    data = data.filter(l => l.model.toLowerCase().includes(q) || l.provider.toLowerCase().includes(q) || l.storage.toLowerCase().includes(q));
+  }
+
+  // Calcular mínimos por modelo+storage
+  const mins = {};
+  data.forEach(l => { const k=l.model+'|'+l.storage; if(!mins[k]||l.price<mins[k]) mins[k]=l.price; });
+
+  const models = [...new Set(data.map(l => l.model))];
+  models.sort((a,b) => ORDER_IP_USADO.indexOf(a) - ORDER_IP_USADO.indexOf(b));
+
+  const wrap = document.getElementById('wrap-usado');
+  if (!data.length) {
+    wrap.innerHTML = `<table><tbody><tr><td class="empty-row" colspan="8">Sin datos de usados. Cargalos desde el panel admin.</td></tr></tbody></table>`;
+    return;
+  }
+
+  let html = `<table><thead><tr>
+    <th style="width:14px"></th><th>Modelo</th><th>Cap.</th>
+    <th>Proveedor</th><th>Precio</th><th>vs mejor</th>
+    <th>Batería</th><th>Calidad</th><th>Nota</th>
+  </tr></thead><tbody>`;
+
+  models.forEach(model => {
+    const rows = data.filter(l => l.model === model);
+    rows.sort((a,b) => {
+      if (a.storage !== b.storage) return capRank(a.storage) - capRank(b.storage);
+      return a.price - b.price;
+    });
+    html += `<tr class="g"><td colspan="9">${model}</td></tr>`;
+    rows.forEach(l => {
+      const k = l.model+'|'+l.storage;
+      const best = l.price === mins[k];
+      const diff = l.price - mins[k];
+      const diffHtml = diff===0 ? `<span class="ok">mejor precio</span>` : `<span class="dn">+$${diff}</span>`;
+      const batHtml = l.battery ? `<span class="bat ${batClass(l.battery)}">${l.battery}</span>` : '—';
+      html += `<tr class="${best?'best':''}">
+        <td>${best?'<span class="star">★</span>':''}</td>
+        <td></td>
+        <td><span style="font-size:12px;color:var(--muted)">${l.storage}</span></td>
+        <td><span class="pb ${badgeCls(l.provider)}">${l.provider}</span></td>
+        <td><span class="pv">USD ${l.price}</span></td>
+        <td>${diffHtml}</td>
+        <td>${batHtml}</td>
+        <td><span class="qual">${l.quality||'—'}</span></td>
+        <td><span class="nc">${l.note||''}</span></td>
+      </tr>`;
+    });
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
 function renderCat(cat) {
   let filt = listings.filter(CAT_MAP[cat]).filter(getSearch);
 
@@ -858,6 +1051,7 @@ function renderCat(cat) {
 
 function renderAll() {
   ['iphone','samsung','google','mac','ipad','watch','airpods','laptop','acc'].forEach(renderCat);
+  renderUsado();
 }
 
 // ═══════════════════════════════════════
@@ -920,21 +1114,40 @@ async function saveAllWA() {
   const msg=document.getElementById('admin-msg');
   btn.disabled=true; btn.textContent='Guardando…';
   try {
+    let newItems=[];
+    const provsTouched=new Set();
+
+    // ── Nuevos ──
     const svetText=document.getElementById('txt-svet').value;
     const julianText=document.getElementById('txt-julian').value;
-    let newItems=[];
-    if (svetText.trim()) newItems.push(...parseWhatsApp(svetText,'SVET'));
-    if (julianText.trim()) newItems.push(...parseWhatsApp(julianText,'JULIAN'));
-    if (!newItems.length) { msg.innerHTML=`<div class="smsg err">Sin productos detectados.</div>`; return; }
-    // Leer Gist actual, reemplazar SVET y JULIAN, guardar
+    const nuevoNombre=(document.getElementById('txt-nuevo-nombre').value||'').trim().toUpperCase();
+    const nuevoText=document.getElementById('txt-nuevo').value;
+    if (svetText.trim()) { const items=parseWhatsApp(svetText,'SVET'); newItems.push(...items); provsTouched.add('SVET'); }
+    if (julianText.trim()) { const items=parseWhatsApp(julianText,'JULIAN'); newItems.push(...items); provsTouched.add('JULIAN'); }
+    if (nuevoNombre && nuevoText.trim()) {
+      const items=parseWhatsApp(nuevoText,nuevoNombre); newItems.push(...items); provsTouched.add(nuevoNombre);
+    }
+
+    // ── Usados ──
+    const tecnoText=document.getElementById('txt-tecnocity').value;
+    const usadoNombre=(document.getElementById('txt-usado-nombre').value||'').trim().toUpperCase();
+    const usadoText=document.getElementById('txt-usado-nuevo').value;
+    if (tecnoText.trim()) { const items=parseUsadoText(tecnoText,'TECNOCITY'); newItems.push(...items); provsTouched.add('TECNOCITY'); }
+    if (usadoNombre && usadoText.trim()) {
+      const items=parseUsadoText(usadoText,usadoNombre); newItems.push(...items); provsTouched.add(usadoNombre);
+    }
+
+    if (!newItems.length) { msg.innerHTML=`<div class="smsg err">Sin productos detectados. Revisá los textos.</div>`; btn.disabled=false; btn.textContent='Guardar en Gist'; return; }
+
     const current=await readGist();
-    const provs=new Set(newItems.map(l=>l.provider));
-    const updated=[...current.filter(l=>!provs.has(l.provider)||l.provider==='MAURO'),...newItems];
+    const updated=[...current.filter(l=>!provsTouched.has(l.provider)),...newItems];
     await writeGist(updated);
-    listings=listings.filter(l=>!provs.has(l.provider));
+    listings=listings.filter(l=>!provsTouched.has(l.provider));
     listings.push(...newItems);
     buildFilters(); renderAll();
-    msg.innerHTML=`<div class="smsg ok">✓ ${newItems.length} productos guardados. Vendedores verán los cambios al actualizar.</div>`;
+    const nuevosCount=newItems.filter(l=>l.condition!=='used').length;
+    const usadosCount=newItems.filter(l=>l.condition==='used').length;
+    msg.innerHTML=`<div class="smsg ok">✓ Guardados: ${nuevosCount} nuevos + ${usadosCount} usados (${[...provsTouched].join(', ')}).</div>`;
   } catch(e) {
     msg.innerHTML=`<div class="smsg err">✗ ${e.message}</div>`;
   }
