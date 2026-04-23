@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,32 +7,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ── TOKENS ── */
-[data-theme="dark"] {
-  --bg: #08080e;
-  --s1: #111118;
-  --s2: #18181f;
-  --s3: #22222c;
-  --border: #2c2c3a;
-  --border2: #3a3a4a;
-  --text: #e0e0ee;
-  --muted: #6a6a88;
-  --dim: #3a3a52;
-  --accent: #00e5a0;
-  --accent-dim: rgba(0,229,160,0.1);
-  --blue: #4a9eff;
-  --blue-dim: rgba(74,158,255,0.1);
-  --orange: #ff6b35;
-  --orange-dim: rgba(255,107,53,0.1);
-  --green: #00e5a0;
-  --shadow: 0 4px 24px rgba(0,0,0,.5);
-}
 [data-theme="light"] {
   --bg: #f4f4f8;
   --s1: #ffffff;
   --s2: #f0f0f5;
   --s3: #e8e8f0;
   --border: #dcdce8;
-  --border2: #c8c8d8;
   --text: #18182a;
   --muted: #7070a0;
   --dim: #b0b0c8;
@@ -42,226 +22,303 @@
   --blue-dim: rgba(40,120,224,0.1);
   --orange: #e05020;
   --orange-dim: rgba(224,80,32,0.1);
-  --green: #00a372;
-  --shadow: 0 4px 24px rgba(0,0,0,.12);
+  --shadow: 0 1px 4px rgba(0,0,0,.08);
+  --shadow-lg: 0 4px 20px rgba(0,0,0,.12);
+  --row-best: #f0faf5;
+  --row-best-border: #bbf0d8;
+  --star: #16a34a;
+  --best-text: #166534;
+  --diff-text: #dc2626;
+  --group-bg: #f5f5fa;
+  --group-text: #555;
 }
-
-/* ── BASE ── */
+[data-theme="dark"] {
+  --bg: #08080e;
+  --s1: #111118;
+  --s2: #18181f;
+  --s3: #22222c;
+  --border: #2c2c3a;
+  --text: #e0e0ee;
+  --muted: #6a6a88;
+  --dim: #3a3a52;
+  --accent: #00e5a0;
+  --accent-dim: rgba(0,229,160,0.1);
+  --blue: #4a9eff;
+  --blue-dim: rgba(74,158,255,0.1);
+  --orange: #ff6b35;
+  --orange-dim: rgba(255,107,53,0.1);
+  --shadow: 0 1px 4px rgba(0,0,0,.4);
+  --shadow-lg: 0 4px 20px rgba(0,0,0,.5);
+  --row-best: rgba(0,229,160,0.06);
+  --row-best-border: rgba(0,229,160,0.2);
+  --star: #00e5a0;
+  --best-text: #00e5a0;
+  --diff-text: #ff6b35;
+  --group-bg: #1a1a24;
+  --group-text: #8888aa;
+}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;transition:background .2s,color .2s;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
 
 /* ── HEADER ── */
-header{
-  position:sticky;top:0;z-index:100;
-  background:var(--s1);
-  border-bottom:1px solid var(--border);
+.hdr{
+  background:var(--s1);border-bottom:1px solid var(--border);
   padding:0 20px;height:52px;
   display:flex;align-items:center;gap:12px;
-  box-shadow:var(--shadow);
+  position:sticky;top:0;z-index:100;box-shadow:var(--shadow);
 }
-.logo{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.12em;white-space:nowrap;flex-shrink:0;}
+.logo{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.12em;flex-shrink:0;}
 .logo em{color:var(--muted);font-style:normal;font-weight:400;}
-.search-wrap{position:relative;flex:1;max-width:340px;}
+.search-wrap{position:relative;flex:1;max-width:300px;}
 .search-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:13px;pointer-events:none;}
-#searchInput{
-  width:100%;padding:7px 10px 7px 30px;
-  background:var(--s2);border:1px solid var(--border);border-radius:4px;
-  color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .15s;
-}
+#searchInput{width:100%;padding:6px 10px 6px 29px;background:var(--s2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .15s;}
 #searchInput:focus{border-color:var(--accent);}
 #searchInput::placeholder{color:var(--dim);}
 .hright{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;}
-
-/* ── BUTTONS ── */
-.btn{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.07em;padding:6px 12px;border-radius:3px;border:1px solid;cursor:pointer;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
-.btn-g{background:transparent;color:var(--muted);border-color:var(--border);}
-.btn-g:hover{color:var(--text);border-color:var(--border2);}
+.upd{font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);white-space:nowrap;}
+.btn{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.06em;padding:5px 11px;border-radius:3px;border:1px solid;cursor:pointer;transition:all .15s;white-space:nowrap;background:transparent;}
 .btn-p{background:var(--accent);color:#000;border-color:var(--accent);}
 .btn-p:hover{filter:brightness(1.1);}
-.btn-b{background:transparent;color:var(--blue);border-color:var(--blue);}
+.btn-b{color:var(--blue);border-color:var(--blue);}
 .btn-b:hover{background:var(--blue-dim);}
-.btn-o{background:transparent;color:var(--orange);border-color:var(--orange);}
+.btn-g{color:var(--muted);border-color:var(--border);}
+.btn-g:hover{color:var(--text);border-color:var(--muted);}
+.btn-o{color:var(--orange);border-color:var(--orange);}
 .btn-o:hover{background:var(--orange-dim);}
+.theme-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--s2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.admin-badge{font-family:'Space Mono',monospace;font-size:9px;color:var(--orange);border:1px solid var(--orange);padding:2px 7px;border-radius:2px;opacity:.8;}
 
-/* theme toggle */
-.theme-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--s2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .15s;flex-shrink:0;}
-.theme-btn:hover{border-color:var(--border2);}
+/* ── LOADING BAR ── */
+.lbar{height:2px;background:var(--border);}
+.lfill{height:100%;background:var(--accent);width:0%;transition:width .35s;}
 
-/* ── LAYOUT ── */
-.app{display:flex;height:calc(100vh - 52px);}
+/* ── TABS ── */
+.tabs{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:10px 14px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all .15s;}
+.tab:hover{color:var(--text);}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent);}
+.tab.admin-tab{color:var(--orange);}
+.tab.admin-tab.on{color:var(--orange);border-bottom-color:var(--orange);}
 
-/* ── SIDEBAR ── */
-.sidebar{width:196px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);overflow-y:auto;padding:12px 0;}
-.sb-sec{padding:0 12px;margin-bottom:20px;}
-.sb-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.15em;color:var(--dim);text-transform:uppercase;margin-bottom:6px;padding-left:2px;}
-.fb{display:flex;align-items:center;gap:7px;width:100%;padding:6px 8px;border-radius:3px;border:none;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .1s;text-align:left;}
-.fb:hover{background:var(--s2);color:var(--text);}
-.fb.on{background:var(--s2);color:var(--text);}
-.fb.on .dot{opacity:1;}
-.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;opacity:.3;transition:opacity .1s;}
-.fc{margin-left:auto;font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);}
+/* ── WRAP ── */
+.wrap{max-width:1060px;margin:16px auto;padding:0 16px;}
 
-/* ── MAIN ── */
-.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+/* ── BAR DE FILTROS ── */
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+.bar select{height:32px;padding:0 10px;border:1px solid var(--border);border-radius:5px;font-size:13px;background:var(--s1);color:var(--text);cursor:pointer;outline:none;}
+.leg{display:flex;gap:8px;margin-left:auto;align-items:center;flex-wrap:wrap;}
+.li{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);}
+.dot8{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
-/* ── FILTER BAR ── */
-.filterbar{
-  position:sticky;top:0;z-index:10;
-  background:var(--bg);
-  border-bottom:1px solid var(--border);
-  padding:7px 14px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;
-}
-.chip{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.06em;padding:4px 10px;border-radius:20px;border:1px solid;cursor:pointer;transition:all .15s;white-space:nowrap;background:transparent;}
-.chip:hover{opacity:.8;}
-.chip.on{color:#000!important;border-color:transparent!important;}
-.chip-sep{width:1px;height:16px;background:var(--border);flex-shrink:0;margin:0 3px;}
-.sort-wrap{display:flex;gap:2px;background:var(--s2);border-radius:3px;padding:2px;}
-.stab{font-family:'Space Mono',monospace;font-size:9px;padding:3px 8px;border-radius:2px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .1s;}
-.stab.on{background:var(--s1);color:var(--text);}
-.view-btns{display:flex;gap:2px;background:var(--s2);border-radius:3px;padding:2px;}
-.vbtn{font-family:'Space Mono',monospace;font-size:9px;padding:3px 8px;border-radius:2px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .1s;}
-.vbtn.on{background:var(--s1);color:var(--text);}
-.rcount{font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);white-space:nowrap;}
+/* ── TABLE ── */
+table{width:100%;border-collapse:collapse;background:var(--s1);border-radius:8px;overflow:hidden;box-shadow:var(--shadow);font-size:13px;}
+th{background:var(--s2);padding:7px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr.g td{background:var(--group-bg);font-weight:600;font-size:11px;color:var(--group-text);text-transform:uppercase;letter-spacing:.04em;padding:5px 10px;border-top:2px solid var(--border);}
+tr.best td{background:var(--row-best);}
+tr.best .pv{color:var(--best-text);font-weight:700;}
+.star{color:var(--star);font-size:11px;margin-right:2px;}
+.pv{font-size:13px;font-weight:600;}
+.lp{font-size:11px;color:var(--dim);text-decoration:line-through;margin-right:4px;}
+.ok{font-size:11px;color:var(--star);font-weight:500;}
+.dn{font-size:11px;color:var(--diff-text);}
+.nc{font-size:11px;color:var(--orange);font-style:italic;}
+.sub{font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--s1);border-radius:6px;border:1px solid var(--border);}
+.empty-row{text-align:center;padding:30px;color:var(--dim);font-size:13px;}
 
-/* ── LOADING ── */
-.loading-bar{height:2px;background:var(--border);position:sticky;top:0;z-index:20;}
-.loading-fill{height:100%;background:var(--accent);width:0%;transition:width .4s;}
+/* ── PROVIDER BADGES ── */
+.pb{display:inline-block;padding:2px 7px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
+.pm{background:#dcfce7;color:#166534}
+.ps{background:#dbeafe;color:#1d4ed8}
+.pj{background:#fed7aa;color:#9a3412}
+.pl{background:#ede9fe;color:#6d28d9}
+.pia{background:#fce7f3;color:#9d174d}
+.ptc{background:#e0f2fe;color:#0c4a6e}
+.ptb{background:#fef3c7;color:#78350f}
+.pcr{background:#f0fdf4;color:#14532d}
+.pte{background:#fdf2f8;color:#6b21a8}
+.psh{background:#f3e8ff;color:#6d28d9}
 
-/* ── CONTENT ── */
-.content{flex:1;padding:14px;}
-.prov-group{margin-bottom:26px;}
-.prov-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
-.prov-badge{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 7px;border-radius:2px;text-transform:uppercase;}
-.prov-cnt{font-size:11px;color:var(--muted);}
-table{width:100%;border-collapse:collapse;font-size:12px;}
-thead th{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);}
-tbody tr{border-bottom:1px solid var(--border);transition:background .08s;}
-tbody tr:hover{background:var(--s2);}
-td{padding:7px 8px;vertical-align:middle;}
-.td-model{font-weight:500;}
-.td-storage{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
-.td-price{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap;}
-.td-colors{font-size:11px;color:var(--muted);}
-.tag-stk{font-family:'Space Mono',monospace;font-size:8px;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(0,229,160,.2);padding:2px 6px;border-radius:2px;}
-.tag-ing{font-family:'Space Mono',monospace;font-size:8px;color:var(--orange);background:var(--orange-dim);border:1px solid rgba(255,107,53,.2);padding:2px 6px;border-radius:2px;}
-.tag-no{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);background:var(--s3);border:1px solid var(--border);padding:2px 6px;border-radius:2px;}
-.note{font-size:9px;color:var(--orange);margin-left:4px;}
+/* Stock badges */
+.stk{font-family:'Space Mono',monospace;font-size:8px;padding:1px 5px;border-radius:2px;border:1px solid;margin-left:4px;}
+.stk-s{color:#16a34a;border-color:#86efac;background:#f0fdf4;}
+.stk-i{color:#ea580c;border-color:#fdba74;background:#fff7ed;}
+.stk-n{color:var(--muted);border-color:var(--border);background:var(--s2);}
 
-/* ── COMPARE ── */
-.compare-wrap{overflow-x:auto;}
-.ctable{width:100%;border-collapse:collapse;font-size:12px;}
-.ctable th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;padding:8px 12px;border-bottom:2px solid var(--border);text-align:left;white-space:nowrap;background:var(--bg);position:sticky;top:0;z-index:2;}
-.ctable td{padding:7px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
-.ctable tr:hover td{background:var(--s2);}
-.cm{font-weight:500;}
-.cs{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
-.cp{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;}
-.cp-best{color:var(--accent);}
-.cp-high{color:var(--muted);}
-.cp-mid{color:var(--text);}
-.cp-na{color:var(--dim);font-family:'Space Mono',monospace;font-size:10px;}
-.cdiff{font-family:'Space Mono',monospace;font-size:9px;color:var(--orange);}
-
-/* ── EMPTY ── */
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:8px;color:var(--dim);}
-.empty-ico{font-size:32px;opacity:.25;}
-.empty-txt{font-family:'Space Mono',monospace;font-size:11px;}
+/* ── ADMIN PANEL ── */
+.admin-wrap{max-width:800px;}
+.info-box{background:var(--blue-dim);border:1px solid var(--blue);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:14px;line-height:1.6;}
+.carga-sec{margin-bottom:20px;}
+.carga-sec h2{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.06em;}
+.carga-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;}
+.card{background:var(--s1);border-radius:8px;padding:14px;border:1px solid var(--border);}
+.card h3{font-size:12px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:7px;}
+.card p{font-size:11px;color:var(--muted);margin-bottom:7px;}
+.card textarea{width:100%;height:160px;padding:8px;border:1px solid var(--border);border-radius:5px;font-size:11px;font-family:monospace;resize:vertical;line-height:1.5;background:var(--s2);color:var(--text);}
+.card textarea:focus{outline:none;border-color:var(--accent);}
+.save-row{display:flex;justify-content:center;margin-top:14px;gap:10px;}
+.smsg{font-family:'Space Mono',monospace;font-size:10px;margin-top:8px;padding:6px 10px;border-radius:3px;}
+.smsg.ok{color:var(--accent);background:var(--accent-dim);}
+.smsg.err{color:var(--orange);background:var(--orange-dim);}
+.smsg.info{color:var(--blue);background:var(--blue-dim);}
 
 /* ── MODAL ── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
 .overlay.open{opacity:1;pointer-events:all;}
-.modal{background:var(--s1);border:1px solid var(--border);border-radius:6px;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;transform:translateY(8px);transition:transform .2s;box-shadow:var(--shadow);}
+.modal{background:var(--s1);border:1px solid var(--border);border-radius:8px;width:100%;max-width:440px;transform:translateY(8px);transition:transform .2s;box-shadow:var(--shadow-lg);}
 .overlay.open .modal{transform:translateY(0);}
-.mhdr{padding:15px 18px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.mhdr{padding:14px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .mtitle{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);}
 .mclose{background:transparent;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 5px;border-radius:2px;}
 .mclose:hover{color:var(--text);background:var(--s2);}
 .mbody{padding:16px;}
-.mfoot{padding:11px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
-.fg{margin-bottom:11px;}
+.mfoot{padding:10px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+.fg{margin-bottom:10px;}
 .flabel{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:4px;}
-.finput,.ftextarea,.fselect{width:100%;padding:7px 10px;background:var(--s2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;transition:border-color .15s;}
-.finput:focus,.ftextarea:focus,.fselect:focus{border-color:var(--accent);}
-.ftextarea{min-height:150px;resize:vertical;font-family:'Space Mono',monospace;font-size:10px;line-height:1.65;}
+.finput,.fselect{width:100%;padding:7px 10px;background:var(--s2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;transition:border-color .15s;}
+.finput:focus,.fselect:focus{border-color:var(--accent);}
 .fselect{cursor:pointer;}
-.prevbox{background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:9px;margin-top:9px;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);max-height:150px;overflow-y:auto;line-height:1.8;}
-.prow{display:flex;gap:5px;padding:2px 0;border-bottom:1px solid var(--border);}
-.prow:last-child{border:none;}
-.pok{color:var(--accent);}
-.pf{color:var(--dim);min-width:50px;}
-.smsg{font-family:'Space Mono',monospace;font-size:9px;margin-top:7px;padding:5px 9px;border-radius:2px;}
-.smsg.ok{color:var(--accent);background:var(--accent-dim);}
-.smsg.err{color:var(--orange);background:var(--orange-dim);}
-.smsg.info{color:var(--blue);background:var(--blue-dim);}
-.lbar{height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:6px;}
-.lfill{height:100%;background:var(--accent);width:0%;transition:width .3s;border-radius:1px;}
-.sheet-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}
-.sheet-row:last-child{border:none;}
-.sname{font-size:12px;flex:1;}
-.sgid{font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);}
 
-/* ── ADMIN PANEL ── */
-.admin-badge{font-family:'Space Mono',monospace;font-size:9px;color:var(--orange);border:1px solid var(--orange);padding:2px 8px;border-radius:2px;opacity:.7;}
-
-/* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:3px;height:3px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-
-@media(max-width:680px){
-  .sidebar{display:none;}
-  .td-colors{display:none;}
-}
 </style>
 </head>
 <body>
 
-<header>
+<div class="hdr">
   <div class="logo">PRICE<em>BOARD</em></div>
   <div class="search-wrap">
     <span class="search-ico">⌕</span>
-    <input id="searchInput" placeholder="Buscar modelo, storage, color…" autocomplete="off">
+    <input id="searchInput" placeholder="Buscar modelo, color…" autocomplete="off">
   </div>
   <div class="hright">
-    <span id="updLabel" style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);white-space:nowrap">—</span>
-    <span id="adminBadge" class="admin-badge" style="display:none">ADMIN</span>
+    <span class="upd" id="updLabel">—</span>
+    <span class="admin-badge" id="adminBadge" style="display:none">ADMIN</span>
     <button class="btn btn-b" onclick="refreshAll()" id="refreshBtn">↻ Actualizar</button>
-    <button class="btn btn-o" id="adminBtn" onclick="openAdminModal()" style="display:none">+ WA</button>
+    <button class="btn btn-o" id="adminBtn" style="display:none" onclick="showTab('admin',document.querySelector('.tab.admin-tab'))">Panel Admin</button>
     <button class="btn btn-g" id="loginBtn" onclick="openLoginModal()">Admin</button>
-    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+    <button class="theme-btn" onclick="toggleTheme()">☀️</button>
   </div>
-</header>
-
-<div class="loading-bar"><div class="loading-fill" id="topBar"></div></div>
-
-<div class="app">
-  <aside class="sidebar">
-    <div class="sb-sec">
-      <div class="sb-lbl">Proveedor</div>
-      <button class="fb on" data-ft="provider" data-fv="all">
-        <span class="dot" style="background:var(--text)"></span>Todos<span class="fc" id="cnt-all">0</span>
-      </button>
-      <div id="provFilters"></div>
-    </div>
-    <div class="sb-sec">
-      <div class="sb-lbl">Categoría</div>
-      <div id="catFilters"></div>
-    </div>
-  </aside>
-
-  <main class="main">
-    <div class="filterbar" id="filterbar"></div>
-    <div class="content" id="content">
-      <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Cargando catálogo…</div></div>
-    </div>
-  </main>
 </div>
 
-<!-- MODALS -->
+<div class="lbar"><div class="lfill" id="topBar"></div></div>
+
+<div class="tabs" id="tabs">
+  <button class="tab on" onclick="showTab('iphone',this)">📱 iPhone</button>
+  <button class="tab" onclick="showTab('samsung',this)">📲 Samsung</button>
+  <button class="tab" onclick="showTab('google',this)">🔵 Google</button>
+  <button class="tab" onclick="showTab('mac',this)">💻 Mac</button>
+  <button class="tab" onclick="showTab('ipad',this)">🗒 iPad</button>
+  <button class="tab" onclick="showTab('watch',this)">⌚ Watch</button>
+  <button class="tab" onclick="showTab('airpods',this)">🎧 AirPods</button>
+  <button class="tab" onclick="showTab('laptop',this)">🖥 Laptops</button>
+  <button class="tab" onclick="showTab('acc',this)">🔌 Accesorios</button>
+  <button class="tab admin-tab" id="adminTab" style="display:none" onclick="showTab('admin',this)">⚙️ Admin</button>
+</div>
+
+<div class="wrap">
+  <!-- IPHONE -->
+  <div id="sec-iphone" class="sec on">
+    <div class="bar">
+      <select id="fi-model" onchange="renderCat('iphone')"><option value="">Todos los modelos</option></select>
+      <select id="fi-cap" onchange="renderCat('iphone')"><option value="">Todas las caps.</option></select>
+      <select id="fi-prov" onchange="renderCat('iphone')"><option value="">Todos los proveedores</option></select>
+    </div>
+    <div id="wrap-iphone"></div>
+  </div>
+  <!-- SAMSUNG -->
+  <div id="sec-samsung" class="sec">
+    <div class="bar">
+      <select id="fs-model" onchange="renderCat('samsung')"><option value="">Todos los modelos</option></select>
+      <select id="fs-prov" onchange="renderCat('samsung')"><option value="">Todos los proveedores</option></select>
+    </div>
+    <div id="wrap-samsung"></div>
+  </div>
+  <!-- GOOGLE -->
+  <div id="sec-google" class="sec">
+    <div class="bar">
+      <select id="fg-prov" onchange="renderCat('google')"><option value="">Todos los proveedores</option></select>
+    </div>
+    <div id="wrap-google"></div>
+  </div>
+  <!-- MAC -->
+  <div id="sec-mac" class="sec">
+    <div class="bar">
+      <select id="fm-model" onchange="renderCat('mac')"><option value="">Todos los modelos</option></select>
+      <select id="fm-prov" onchange="renderCat('mac')"><option value="">Todos los proveedores</option></select>
+    </div>
+    <div id="wrap-mac"></div>
+  </div>
+  <!-- IPAD -->
+  <div id="sec-ipad" class="sec">
+    <div class="bar">
+      <select id="fp-prov" onchange="renderCat('ipad')"><option value="">Todos los proveedores</option></select>
+    </div>
+    <div id="wrap-ipad"></div>
+  </div>
+  <!-- WATCH -->
+  <div id="sec-watch" class="sec">
+    <div class="bar">
+      <select id="fw-prov" onchange="renderCat('watch')"><option value="">Todos los proveedores</option></select>
+    </div>
+    <div id="wrap-watch"></div>
+  </div>
+  <!-- AIRPODS -->
+  <div id="sec-airpods" class="sec">
+    <div class="bar">
+      <select id="fa-prov" onchange="renderCat('airpods')"><option value="">Todos los proveedores</option></select>
+    </div>
+    <div id="wrap-airpods"></div>
+  </div>
+  <!-- LAPTOP -->
+  <div id="sec-laptop" class="sec">
+    <div class="bar">
+      <select id="fl-prov" onchange="renderCat('laptop')"><option value="">Todos los proveedores</option></select>
+    </div>
+    <div id="wrap-laptop"></div>
+  </div>
+  <!-- ACCESORIOS -->
+  <div id="sec-acc" class="sec">
+    <div class="bar">
+      <select id="fac-prov" onchange="renderCat('acc')"><option value="">Todos los proveedores</option></select>
+    </div>
+    <div id="wrap-acc"></div>
+  </div>
+  <!-- ADMIN -->
+  <div id="sec-admin" class="sec">
+    <div class="admin-wrap">
+      <div class="info-box">Pegá los mensajes de WhatsApp de cada proveedor y guardá. Los datos se publican en el Gist y todos los vendedores los ven al actualizar.</div>
+      <div class="carga-sec">
+        <h2>📱 Mensajes de WhatsApp</h2>
+        <div class="carga-grid">
+          <div class="card">
+            <h3><span class="pb ps">SVET</span></h3>
+            <p>Mensaje completo de SVET</p>
+            <textarea id="txt-svet" placeholder="Pegá el mensaje completo de SVET…"></textarea>
+          </div>
+          <div class="card">
+            <h3><span class="pb pj">JULIÁN</span></h3>
+            <p>Mensaje completo de JULIÁN</p>
+            <textarea id="txt-julian" placeholder="Pegá el mensaje completo de JULIÁN…"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="save-row">
+        <button class="btn btn-o" onclick="clearAllWA()">🗑 Limpiar todo WA</button>
+        <button class="btn btn-p" onclick="saveAllWA()" id="saveBtn">Guardar en Gist</button>
+      </div>
+      <div id="admin-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LOGIN -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <div class="mhdr">
-      <div class="mtitle" id="mtitle">—</div>
+      <div class="mtitle" id="mtitle">ACCESO ADMIN</div>
       <button class="mclose" onclick="closeModal()">✕</button>
     </div>
     <div class="mbody" id="mbody"></div>
@@ -270,17 +327,13 @@ td{padding:7px 8px;vertical-align:middle;}
 </div>
 
 <script>
-// ════════════════════════════════════════
-// CONFIG — editá estos valores
-// ════════════════════════════════════════
-const CF_WORKER    = 'https://sweet-thunder-5881.tinstern.workers.dev';
-const GIST_ID      = '5d9214407b592fc64f057d25aaa9cab9';
-const GIST_FILE    = 'priceboard-wa.json';
-const ADMIN_PASS   = 'TU_CLAVE_ADMIN'; // ← reemplazá esto antes de subir
-
-// GitHub token: solo el admin lo ingresa en runtime, no va hardcodeado
-let GH_TOKEN = '';
-let isAdmin = false;
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+const CF_WORKER  = 'https://sweet-thunder-5881.tinstern.workers.dev';
+const GIST_ID    = '5d9214407b592fc64f057d25aaa9cab9';
+const GIST_FILE  = 'priceboard-wa.json';
+const ADMIN_PASS = 'TU_CLAVE_ADMIN'; // ← reemplazá antes de subir
 
 const SHEETS_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQQa-sWggZMfzoz1anCTUkqrVEDsRO7rzWJx_OVNOcbHlJugZQjufDldrolxV3qwfmz2LYehX4c736E/pub?output=csv&gid=';
 
@@ -296,64 +349,163 @@ const SHEETS = [
   {gid:'1015954086', name:'Hoja9'},
 ];
 
-const CAT_META = {
-  iPhone:   {color:'#a8c4e8', label:'📱 iPhone'},
-  Samsung:  {color:'#4a9eff', label:'📱 Samsung'},
-  Google:   {color:'#ff6b6b', label:'📱 Google'},
-  AirPods:  {color:'#7dd87d', label:'🎧 AirPods'},
-  Watch:    {color:'#e8c87d', label:'⌚ Watch'},
-  iPad:     {color:'#c87de8', label:'📱 iPad'},
-  Mac:      {color:'#e87d9b', label:'💻 Mac'},
-  Laptop:   {color:'#7db8e8', label:'💻 Laptop'},
-  Accesorio:{color:'#a8a8c8', label:'🔌 Accesorios'},
-};
-
-function provColor(p) {
-  if (p==='SVET')   return '#00e5a0';
-  if (p==='JULIAN') return '#4a9eff';
-  if (p==='SHEET')  return '#9b72ff';
-  return '#aaa';
+// Orden canónico de modelos iPhone
+const ORDER_IP = [
+  'IPHONE SE 3RD GEN','IPHONE 13','IPHONE 13 MINI','IPHONE 13 PRO','IPHONE 13 PRO MAX',
+  'IPHONE 14','IPHONE 14 PLUS','IPHONE 14 PRO','IPHONE 14 PRO MAX',
+  'IPHONE 15','IPHONE 15 PLUS','IPHONE 15 PRO','IPHONE 15 PRO MAX',
+  'IPHONE 16E','IPHONE 16','IPHONE 16 PLUS','IPHONE 16 PRO','IPHONE 16 PRO MAX',
+  'IPHONE 17E','IPHONE 17','IPHONE 17 PLUS','IPHONE 17 PRO','IPHONE 17 PRO MAX',
+];
+const ORDER_SAM = [
+  'SAMSUNG S24 FE','SAMSUNG S24','SAMSUNG S24 PLUS','SAMSUNG S24 ULTRA',
+  'SAMSUNG S25 FE','SAMSUNG S25','SAMSUNG S25 PLUS','SAMSUNG S25 ULTRA',
+  'SAMSUNG S26 FE','SAMSUNG S26','SAMSUNG S26 PLUS','SAMSUNG S26 ULTRA',
+];
+function modelRank(model, order) {
+  const i = order.indexOf(model.toUpperCase());
+  return i >= 0 ? i : 999;
+}
+function capRank(c) {
+  return c==='32GB'?32:c==='64GB'?64:c==='128GB'?128:c==='256GB'?256:c==='512GB'?512:c==='1TB'?1024:c==='2TB'?2048:0;
 }
 
-// ════════════════════════════════════════
+// Provider badge CSS classes
+const BADGE = {SVET:'ps',JULIAN:'pj',JULIÁN:'pj',SHEET:'psh',MAURO:'pm',DEFAULT:'psh'};
+function badgeCls(p) { return BADGE[p] || BADGE.DEFAULT; }
+
+// Provider colors for legend dots
+const PROV_COLORS = {SVET:'#1d4ed8',JULIAN:'#ea580c',JULIÁN:'#ea580c',SHEET:'#7c3aed'};
+function provColor(p) { return PROV_COLORS[p] || '#888'; }
+
+// ═══════════════════════════════════════
+// COLOR BADGES
+// ═══════════════════════════════════════
+const CMAP = {
+  'black':'#111','negro':'#111','jet black':'#111','space black':'#1f2937',
+  'white':'#9ca3af','blanco':'#9ca3af',
+  'blue':'#1d4ed8','azul':'#1d4ed8','sky blue':'#0284c7','ultramarine':'#1e3a8a','ultra marine':'#1e3a8a',
+  'red':'#dc2626','green':'#16a34a','yellow':'#ca8a04','orange':'#ea580c',
+  'pink':'#db2777','purple':'#7c3aed','violet':'#7c3aed','amethyst':'#7c3aed',
+  'teal':'#0d9488','emerald':'#059669','gold':'#b45309','rose gold':'#e879a0',
+  'silver':'#6b7280','gray':'#6b7280','grey':'#6b7280','graphite':'#4b5563',
+  'space gray':'#4b5563','midnight':'#1e293b','starlight':'#b5914f',
+  'sage':'#6b8f5e','lavender':'#a78bfa','lavander':'#a78bfa',
+  'desert':'#c4a46b','hazel':'#78350f','obsidian':'#1c1917',
+  'frost':'#bae6fd','porcelain':'#f1f5f9','rose':'#fb7185',
+  'indigo':'#4338ca','citrus':'#ca8a04','blush':'#f472b6',
+  'whitesilver':'#9ca3af','white silver':'#9ca3af','silverblue':'#5b8fa8',
+  'silver blue':'#5b8fa8','natural':'#a0875a',
+};
+function colorBadge(text) {
+  if (!text) return '';
+  return text.split(/,|–|-(?=[A-Z])/).map(part => {
+    const t = part.trim();
+    if (!t || t.length < 2) return '';
+    const key = t.toLowerCase().replace(/[^a-z ]/g,'').trim();
+    const col = CMAP[key];
+    if (col) {
+      const isD = ['#111','#1f2937','#1e293b','#1c1917'].includes(col);
+      const bg = isD ? '#f3f4f6' : col+'20';
+      return `<span style="display:inline-block;padding:1px 7px;border-radius:999px;font-size:10px;color:${col};background:${bg};border:1px solid ${col}40;margin:1px 2px;font-weight:500">${t}</span>`;
+    }
+    return `<span style="font-size:11px;color:var(--muted);margin:0 2px">${t}</span>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let listings = [];   // array universal de {provider, category, model, storage, ram, price, currency, colors, status, notes}
+let GH_TOKEN = '';
+let isAdmin = false;
+let activeTab = 'iphone';
+let searchQ = '';
+
+// ═══════════════════════════════════════
+// CATEGORÍAS
+// ═══════════════════════════════════════
+const CAT_MAP = {
+  iphone: l => l.category === 'iPhone',
+  samsung: l => l.category === 'Samsung',
+  google: l => l.category === 'Google',
+  mac: l => l.category === 'Mac',
+  ipad: l => l.category === 'iPad',
+  watch: l => l.category === 'Watch',
+  airpods: l => l.category === 'AirPods',
+  laptop: l => l.category === 'Laptop',
+  acc: l => l.category === 'Accesorio',
+};
+
+// ═══════════════════════════════════════
 // THEME
-// ════════════════════════════════════════
+// ═══════════════════════════════════════
 function toggleTheme() {
   const html = document.documentElement;
   const isDark = html.getAttribute('data-theme') === 'dark';
   html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+  document.querySelector('.theme-btn').textContent = isDark ? '☀️' : '🌙';
   localStorage.setItem('pb_theme', isDark ? 'light' : 'dark');
 }
-function initTheme() {
-  const saved = localStorage.getItem('pb_theme') || 'dark';
+(function initTheme() {
+  const saved = localStorage.getItem('pb_theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
-  document.getElementById('themeBtn').textContent = saved === 'dark' ? '☀️' : '🌙';
-}
+  document.querySelector('.theme-btn').textContent = saved === 'dark' ? '☀️' : '🌙';
+})();
 
-// ════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════
-let listings = [];
-let fProvider = 'all', fCategory = 'all';
-let activeSort = 'price-asc', activeView = 'table';
-let searchQ = '';
-
-function updateTs() {
-  const ts = new Date().toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-  document.getElementById('updLabel').textContent = 'Upd: ' + ts;
-}
-
-// ════════════════════════════════════════
+// ═══════════════════════════════════════
 // UTILS
-// ════════════════════════════════════════
+// ═══════════════════════════════════════
 let _uid = 0;
 function uid() { return (++_uid).toString(36); }
+function updateTs() {
+  document.getElementById('updLabel').textContent =
+    'Upd: ' + new Date().toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+
+// ═══════════════════════════════════════
+// NORMALIZER
+// ═══════════════════════════════════════
+function normalizeModel(raw) {
+  let s = raw.toUpperCase().trim();
+  s = s.replace(/["\']/g, '');
+  s = s.replace(/\s*\([^)]*\)/g, '').trim();
+  s = s.replace(/[^\x20-\x7E]/g, '').trim();
+  s = s.replace(/\s*(NEW|ACTIVATED|OPEN BOX|SIN PRECINTOS|EUROPEO|REBAJA|SIM\s*\+\s*ESIM|ESIM|ONLY ESIM)\s*$/i, '').trim();
+  s = s.replace(/\s+/g, ' ').trim();
+
+  // iPhone: normalizar 17 "E", 17 E, 17E → IPHONE 17E
+  s = s.replace(/IPHONE\s*([\d]+)\s*["']?E["']?\b/, 'IPHONE $1E');
+  s = s.replace(/IPHONE(\d)/, 'IPHONE $1');
+  s = s.replace(/\bPRO\s*MAX\b/g, 'PRO MAX');
+
+  // Samsung: quitar RAM del nombre
+  const smInternal = s.match(/\bS(\d{2})\b\s*(ULTRA|PLUS|FE|EDGE)?/g);
+  if (/^SM\s*[-–]/.test(s) && smInternal) {
+    for (const m of smInternal) {
+      const nm = m.match(/S(\d{2})\s*(ULTRA|PLUS|FE|EDGE)?/);
+      if (nm && parseInt(nm[1]) >= 20) {
+        s = 'SAMSUNG S' + nm[1] + (nm[2] ? ' ' + nm[2] : '');
+        break;
+      }
+    }
+  }
+  s = s.replace(/\s+\d+\s*GB\s*\/\s*\d+\s*(GB|TB)/gi, '');
+  s = s.replace(/\s+\d+\s*(GB|TB)(?=\s|$)/gi, '');
+  if (/^SAMSUNG/.test(s)) {
+    s = s.replace(/\s+(BLACK|WHITE|BLUE|VIOLET|SILVER|GRAY|GREY|PINK|GREEN|GOLD|TITANIUM|LAVENDER|TEAL|ORANGE|PURPLE|GRAPHITE|NAVY|ICE|JET).*$/i, '');
+  }
+  s = s.replace(/\s+\d+\s*\+\s*$/,'').replace(/\s+\d+\s*$/,'').trim();
+  if (/^S\d{2}/.test(s) && !/^SAMSUNG/.test(s)) s = 'SAMSUNG ' + s;
+  s = s.replace(/^GALAXY\s+/, 'SAMSUNG ');
+  s = s.replace(/^GOOGLE\s+PIXEL/, 'PIXEL');
+
+  return s.replace(/\s+/g, ' ').trim();
+}
 
 function detectCat(name) {
   const u = name.toUpperCase();
-  // Accesorios primero — antes de iPhone para evitar falsos positivos
-  if (/VIDRIO|GLASS|PROTECTOR|FUNDA|SPIGEN|CABLE|CARGADOR|AIRTAG|PENCIL|MAGSAFE|CASE|COVER/.test(u)) return 'Accesorio';
+  if (/VIDRIO|GLASS|PROTECTOR|FUNDA|SPIGEN|CABLE|CARGADOR|AIRTAG|PENCIL|MAGSAFE|CASE|COVER|AURICULAR/.test(u)) return 'Accesorio';
   if (/IPHONE/.test(u)) return 'iPhone';
   if (/SAMSUNG|GALAXY|S2\d|S1\d/.test(u)) return 'Samsung';
   if (/PIXEL|GOOGLE/.test(u)) return 'Google';
@@ -361,76 +513,34 @@ function detectCat(name) {
   if (/WATCH/.test(u)) return 'Watch';
   if (/IPAD/.test(u)) return 'iPad';
   if (/MACBOOK/.test(u)) return 'Mac';
-  if (/LENOVO|ASUS|HP |ACER|MSI|DELL|LAPTOP/.test(u)) return 'Laptop';
+  if (/LENOVO|ASUS|HP |ACER|MSI|DELL|LAPTOP|NOTEBOOK/.test(u)) return 'Laptop';
   return 'Accesorio';
 }
-// ════════════════════════════════════════
-// NORMALIZAR NOMBRE DE MODELO
-// ════════════════════════════════════════
-function normalizeModel(raw) {
-  let s = raw.toUpperCase().trim();
-  s = s.replace(/["']/g, '');
-  s = s.replace(/\s*\([^)]*\)/g, '').trim();
-  s = s.replace(/[^\x20-\x7E]/g, '').trim();
-  s = s.replace(/\s*(NEW|ACTIVATED|OPEN BOX|SIN PRECINTOS|EUROPEO|REBAJA|SIM\s*\+\s*ESIM|ESIM|ONLY ESIM)\s*$/i, '').trim();
-  s = s.replace(/\s+/g, ' ').trim();
 
-  // ── iPhone ──
-  s = s.replace(/IPHONE\s*(\d+)\s*E\b/, 'IPHONE $1E');
-  s = s.replace(/IPHONE(\d)/, 'IPHONE $1');
-  s = s.replace(/\bPRO\s*MAX\b/g, 'PRO MAX');
-
-  // ── Samsung ──
-  // Caso "SM - S938B/DS 12GB S25 ULTRA 512GB BLACK" → extraer modelo del interior
-  const smInternal = s.match(/\bS(\d{2})\b\s*(ULTRA|PLUS|FE|EDGE|[A-Z]+)?/g);
-  if (/^SM\s*[-–]/.test(s) && smInternal) {
-    // Buscar el modelo real (S25, S26, etc.) que no sea el número de serie
-    for (const m of smInternal) {
-      const nm2 = m.match(/S(\d{2})\s*(ULTRA|PLUS|FE|EDGE)?/);
-      if (nm2 && parseInt(nm2[1]) >= 20) {
-        s = 'SAMSUNG S' + nm2[1] + (nm2[2] ? ' ' + nm2[2] : '');
-        break;
-      }
-    }
-  }
-  // Quitar storage y RAM del nombre Samsung: "256GB 12GB/256GB", "12GB/512GB"
-  s = s.replace(/\s+\d+\s*GB\s*\/\s*\d+\s*(GB|TB)/gi, '');
-  s = s.replace(/\s+\d+\s*(GB|TB)(?=\s|$)/gi, '');
-  // "S26 PLUS" sin prefijo
-  if (/^S\d{2}/.test(s) && !/^SAMSUNG/.test(s)) s = 'SAMSUNG ' + s;
-  s = s.replace(/^GALAXY\s+/, 'SAMSUNG ');
-
-  // ── Google ──
-  s = s.replace(/^GOOGLE\s+PIXEL/, 'PIXEL');
-
-  return s.replace(/\s+/g, ' ').trim();
-}
-
-
+// ═══════════════════════════════════════
+// PARSER SHEET CSV
+// ═══════════════════════════════════════
 function parseCSVLine(line) {
-  const res=[]; let cur='', inQ=false;
+  const res=[]; let cur='',inQ=false;
   for (let i=0;i<line.length;i++) {
     const ch=line[i];
-    if (ch==='"'){inQ=!inQ;continue;}
-    if (ch===','&&!inQ){res.push(cur.trim());cur='';continue;}
+    if(ch==='"'){inQ=!inQ;continue;}
+    if(ch===','&&!inQ){res.push(cur.trim());cur='';continue;}
     cur+=ch;
   }
   res.push(cur.trim());
   return res;
 }
 
-// ════════════════════════════════════════
-// PARSER SHEET CSV
-// ════════════════════════════════════════
 function parseSheetCSV(csvText, sheetName) {
   const lines = csvText.split(/\r?\n/).filter(l=>l.trim());
   const items = [];
-  let currentModel = null;
+  let curModel = null;
 
   for (const line of lines) {
     const cols = parseCSVLine(line);
     while (cols.length < 4) cols.push('');
-    const col1 = cols[1]||'', col2 = cols[2]||'', col3 = cols[3]||'';
+    const col1=cols[1]||'', col2=cols[2]||'', col3=cols[3]||'';
     if (!col1) continue;
     if (/^https?:\/\//.test(col1)) continue;
     if (/^foto\s/i.test(col1)) continue;
@@ -438,12 +548,11 @@ function parseSheetCSV(csvText, sheetName) {
     if (/CONSULTAR/.test(col1.toUpperCase())&&!col2) continue;
 
     const hasPrice = /USD/i.test(col2);
-
     if (hasPrice) {
       const pm = col2.match(/(\d[\d.,]*)/);
       if (!pm) continue;
       const price = parseFloat(pm[1].replace(/\./g,'').replace(',','.'));
-      let model = currentModel, storage='', ram='', colors=[];
+      let model = curModel, storage='', ram='', colors=[];
 
       const ramStorM = col1.match(/(\d+)\s*GB\s*\/\s*(\d+)\s*(GB|TB)/i);
       const storM    = col1.match(/(\d+)\s*(GB|TB)/i);
@@ -462,20 +571,20 @@ function parseSheetCSV(csvText, sheetName) {
       } else {
         if (!model) model = col1.toUpperCase().trim();
       }
-
       if (!model) continue;
+      const normModel = normalizeModel(model);
       const status = (col3||'STK').toUpperCase().trim();
-      items.push({id:uid(),provider:'SHEET',sheetName,category:detectCat(model),model:normalizeModel(model),storage,ram,price,currency:'USD',colors,status:status==='NO'?'NO':status==='ING'?'ING':'STK',notes:''});
+      items.push({id:uid(),provider:'SHEET',sheetName,category:detectCat(normModel),model:normModel,storage,ram,price,currency:'USD',colors,status:status==='NO'?'NO':status==='ING'?'ING':'STK',notes:''});
     } else if (!col2) {
-      currentModel = col1.toUpperCase().trim();
+      curModel = col1.toUpperCase().trim();
     }
   }
   return items;
 }
 
-// ════════════════════════════════════════
+// ═══════════════════════════════════════
 // PARSER WHATSAPP
-// ════════════════════════════════════════
+// ═══════════════════════════════════════
 function cleanWA(s) {
   return s.replace(/\*/g,'').replace(/[😃🔥📱🎧🔹🔶🔷🇺🇸‼️💸📄ℹ️🏆❗💰·]/gu,'').replace(/\s+/g,' ').trim();
 }
@@ -484,23 +593,22 @@ function parseWhatsApp(text, prov) {
   const lines = text.split('\n').map(l=>cleanWA(l)).filter(l=>l.length>1);
   const items = [];
   let model=null, cat=null;
-  const reModel    = /^(IPHONE|SAMSUNG|GALAXY|GOOGLE\s*PIXEL|PIXEL|AIRPOD|WATCH|IPAD|MACBOOK|S2\d|S1\d)/i;
-  const reStorFst  = /^(\d+(?:\/\d+)?(?:GB|TB)|1TB)/i;
-  const reSamsungL = /(\d+)\s*\+\s*(\d+(?:GB|TB)|1TB)/i;
-  const rePrice    = /[uU]\$\s*([\d.,]+)|[＄$]\s*(\d+)/;
+  const reModel   = /^(IPHONE|SAMSUNG|GALAXY|GOOGLE\s*PIXEL|PIXEL|AIRPOD|WATCH|IPAD|MACBOOK|S2\d|S1\d)/i;
+  const reStorFst = /^(\d+(?:\/\d+)?(?:GB|TB)|1TB)/i;
+  const reSamL    = /(\d+)\s*\+\s*(\d+(?:GB|TB)|1TB)/i;
+  const rePrice   = /[uU]\$\s*([\d.,]+)|[＄$]\s*(\d+)/;
 
   for (let i=0;i<lines.length;i++) {
     const line=lines[i];
     if (!line) continue;
-
-    if (reModel.test(line)&&!reStorFst.test(line)&&!reSamsungL.test(line)) {
+    if (reModel.test(line)&&!reStorFst.test(line)&&!reSamL.test(line)) {
       model=normalizeModel(line.replace(/[^a-zA-Z0-9\s\-\/""()]+/g,'').trim());
-      cat=detectCat(model);
-      continue;
+      cat=detectCat(model); continue;
     }
     if (!model) continue;
 
-    const mSJ=reSamsungL.exec(line);
+    // Samsung inline "S26 PLUS 12 + 256GB. *u$ 975*"
+    const mSJ=reSamL.exec(line);
     if (mSJ) {
       const pm=rePrice.exec(line); if (!pm) continue;
       const price=parseFloat((pm[1]||pm[2]).replace(/\./g,'').replace(',','.'));
@@ -510,7 +618,7 @@ function parseWhatsApp(text, prov) {
       items.push({id:uid(),provider:prov,sheetName:'',category:cat,model,storage,ram,price,currency:'USD',colors,status:'ok',notes:/canada/i.test(line)?'Canada Spec':''});
       continue;
     }
-
+    // Storage al inicio "128GB. - u$ 635 ( White )"
     if (reStorFst.test(line)) {
       const pm=rePrice.exec(line); if (!pm) continue;
       const price=parseFloat((pm[1]||pm[2]).replace(/\./g,'').replace(',','.'));
@@ -530,35 +638,29 @@ function parseWhatsApp(text, prov) {
       items.push({id:uid(),provider:prov,sheetName:'',category:cat,model,storage,ram,price,currency:'USD',colors,status:'ok',notes});
       continue;
     }
-
+    // Accesorio inline
     const mAcc=line.match(/^(.+?)\s*[\.\-]+\s*[uU]\$\s*([\d.,]+)/);
     if (mAcc) {
       const price=parseFloat(mAcc[2].replace(/\./g,'').replace(',','.'));
-      items.push({id:uid(),provider:prov,sheetName:'',category:detectCat(mAcc[1]),model:mAcc[1].trim().toUpperCase(),storage:'',ram:'',price,currency:'USD',colors:[],status:'ok',notes:''});
+      const nm=normalizeModel(mAcc[1].trim());
+      items.push({id:uid(),provider:prov,sheetName:'',category:detectCat(nm),model:nm,storage:'',ram:'',price,currency:'USD',colors:[],status:'ok',notes:''});
     }
   }
   return items;
 }
 
-// ════════════════════════════════════════
-// FETCH SHEET
-// ════════════════════════════════════════
+// ═══════════════════════════════════════
+// FETCH
+// ═══════════════════════════════════════
 async function fetchSheet(gid, name) {
-  const url = CF_WORKER + '?gid=' + gid;
-  const res = await fetch(url);
+  const res = await fetch(CF_WORKER + '?gid=' + gid);
   if (!res.ok) throw new Error('HTTP '+res.status);
-  const csv = await res.text();
-  return parseSheetCSV(csv, name);
+  return parseSheetCSV(await res.text(), name);
 }
 
-// ════════════════════════════════════════
-// GIST — leer y escribir datos WA
-// ════════════════════════════════════════
 async function readGist() {
   try {
-    const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
-      headers: {'Accept':'application/vnd.github+json'}
-    });
+    const res = await fetch(`https://api.github.com/gists/${GIST_ID}`,{headers:{'Accept':'application/vnd.github+json'}});
     if (!res.ok) return [];
     const data = await res.json();
     const content = data.files?.[GIST_FILE]?.content;
@@ -567,402 +669,265 @@ async function readGist() {
   } catch(e) { return []; }
 }
 
-async function writeGist(waListings) {
+async function writeGist(items) {
   if (!GH_TOKEN) throw new Error('Sin token');
-  const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
-    method: 'PATCH',
-    headers: {
-      'Authorization': 'Bearer ' + GH_TOKEN,
-      'Accept': 'application/vnd.github+json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      files: { [GIST_FILE]: { content: JSON.stringify(waListings, null, 2) } }
-    })
+  const res = await fetch(`https://api.github.com/gists/${GIST_ID}`,{
+    method:'PATCH',
+    headers:{'Authorization':'Bearer '+GH_TOKEN,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+    body: JSON.stringify({files:{[GIST_FILE]:{content:JSON.stringify(items,null,2)}}})
   });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || 'Error al guardar');
-  }
-  return true;
+  if (!res.ok) { const e=await res.json(); throw new Error(e.message||'Error Gist'); }
 }
 
-// ════════════════════════════════════════
-// REFRESH ALL (carga sheets + gist)
-// ════════════════════════════════════════
 async function refreshAll() {
-  const btn = document.getElementById('refreshBtn');
-  const bar = document.getElementById('topBar');
-  btn.disabled = true;
-  bar.style.width = '10%';
-
-  let sheetItems = [];
-  const total = SHEETS.length;
-
-  for (let i=0;i<total;i++) {
-    bar.style.width = Math.round(10 + (i/total)*70) + '%';
-    try {
-      const items = await fetchSheet(SHEETS[i].gid, SHEETS[i].name);
-      sheetItems.push(...items);
-    } catch(e) { console.warn('Sheet fail:', SHEETS[i].name, e.message); }
+  const btn=document.getElementById('refreshBtn');
+  const bar=document.getElementById('topBar');
+  btn.disabled=true; bar.style.width='10%';
+  let items=[];
+  for (let i=0;i<SHEETS.length;i++) {
+    bar.style.width=Math.round(10+(i/SHEETS.length)*70)+'%';
+    try { items.push(...await fetchSheet(SHEETS[i].gid, SHEETS[i].name)); } catch(e){}
   }
-
-  bar.style.width = '85%';
+  bar.style.width='88%';
   const waItems = await readGist();
-
-  listings = [...sheetItems, ...waItems];
-  bar.style.width = '100%';
+  listings = [...items, ...waItems];
+  bar.style.width='100%';
   updateTs();
+  buildFilters();
   renderAll();
-
-  setTimeout(() => { bar.style.width='0%'; btn.disabled=false; }, 600);
+  setTimeout(()=>{bar.style.width='0%';btn.disabled=false;},600);
 }
 
-// ════════════════════════════════════════
-// FILTERED DATA
-// ════════════════════════════════════════
-function getFiltered() {
-  let data = [...listings];
-  if (fProvider !== 'all') data = data.filter(l=>l.provider===fProvider);
-  if (fCategory !== 'all') data = data.filter(l=>l.category===fCategory);
-  if (searchQ) {
-    const q = searchQ.toLowerCase();
-    data = data.filter(l=>
-      l.model.toLowerCase().includes(q) ||
-      l.provider.toLowerCase().includes(q) ||
-      l.sheetName.toLowerCase().includes(q) ||
-      l.storage.toLowerCase().includes(q) ||
-      l.colors.join(' ').toLowerCase().includes(q)
-    );
+// ═══════════════════════════════════════
+// BUILD FILTERS
+// ═══════════════════════════════════════
+function buildFilters() {
+  function fillSelect(id, vals, label) {
+    const el=document.getElementById(id);
+    if (!el) return;
+    el.innerHTML=`<option value="">${label}</option>`+vals.map(v=>`<option>${v}</option>`).join('');
   }
-  if (activeSort==='price-asc')  data.sort((a,b)=>a.price-b.price);
-  else if (activeSort==='price-desc') data.sort((a,b)=>b.price-a.price);
-  else data.sort((a,b)=>a.model.localeCompare(b.model));
-  return data;
-}
-
-// ════════════════════════════════════════
-// RENDER SIDEBAR
-// ════════════════════════════════════════
-function renderSidebar() {
-  document.getElementById('cnt-all').textContent = listings.length;
-
-  const provMap={};
-  listings.forEach(l=>{provMap[l.provider]=(provMap[l.provider]||0)+1;});
-  document.getElementById('provFilters').innerHTML = Object.entries(provMap).map(([p,c])=>{
-    const col=provColor(p);
-    return `<button class="fb ${fProvider===p?'on':''}" data-ft="provider" data-fv="${p}">
-      <span class="dot" style="background:${col}"></span>${p}<span class="fc">${c}</span></button>`;
-  }).join('');
-
-  const catMap={};
-  listings.forEach(l=>{catMap[l.category]=(catMap[l.category]||0)+1;});
-  document.getElementById('catFilters').innerHTML = Object.entries(catMap).map(([c,n])=>{
-    const m=CAT_META[c]||{color:'#a8a8c8',label:c};
-    return `<button class="fb ${fCategory===c?'on':''}" data-ft="category" data-fv="${c}">
-      <span class="dot" style="background:${m.color}"></span>${m.label}<span class="fc">${n}</span></button>`;
-  }).join('');
-
-  document.querySelectorAll('.fb[data-ft]').forEach(btn=>{
-    btn.onclick=()=>{
-      const ft=btn.dataset.ft, fv=btn.dataset.fv;
-      if (ft==='provider') {
-        fProvider=fv;
-        document.querySelectorAll('.fb[data-ft="provider"]').forEach(b=>b.classList.toggle('on',b.dataset.fv===fv));
-      } else {
-        fCategory=fCategory===fv?'all':fv;
-        document.querySelectorAll('.fb[data-ft="category"]').forEach(b=>b.classList.toggle('on',b.dataset.fv===fCategory));
-      }
-      renderFilterBar(); renderContent();
-    };
+  // iPhone
+  const ipModels=[...new Set(listings.filter(CAT_MAP.iphone).map(l=>l.model))].sort((a,b)=>modelRank(a,ORDER_IP)-modelRank(b,ORDER_IP));
+  const ipCaps=[...new Set(listings.filter(CAT_MAP.iphone).map(l=>l.storage).filter(Boolean))].sort((a,b)=>capRank(a)-capRank(b));
+  const ipProvs=[...new Set(listings.filter(CAT_MAP.iphone).map(l=>l.provider))].sort();
+  fillSelect('fi-model',ipModels,'Todos los modelos');
+  fillSelect('fi-cap',ipCaps,'Todas las caps.');
+  fillSelect('fi-prov',ipProvs,'Todos los proveedores');
+  // Samsung
+  const samModels=[...new Set(listings.filter(CAT_MAP.samsung).map(l=>l.model))].sort((a,b)=>modelRank(a,ORDER_SAM)-modelRank(b,ORDER_SAM));
+  fillSelect('fs-model',samModels,'Todos los modelos');
+  fillSelect('fs-prov',[...new Set(listings.filter(CAT_MAP.samsung).map(l=>l.provider))],'Todos los proveedores');
+  // Others
+  [['fg-prov','google'],['fm-model',null],['fm-prov','mac'],['fp-prov','ipad'],['fw-prov','watch'],['fa-prov','airpods'],['fl-prov','laptop'],['fac-prov','acc']].forEach(([id,cat])=>{
+    if (!cat) return;
+    const provs=[...new Set(listings.filter(CAT_MAP[cat]).map(l=>l.provider))].sort();
+    fillSelect(id,provs,'Todos los proveedores');
   });
+  const macModels=[...new Set(listings.filter(CAT_MAP.mac).map(l=>l.model))].sort();
+  fillSelect('fm-model',macModels,'Todos los modelos');
 }
 
-// ════════════════════════════════════════
-// RENDER FILTER BAR
-// ════════════════════════════════════════
-function renderFilterBar() {
-  let base=[...listings];
-  if (fProvider!=='all') base=base.filter(l=>l.provider===fProvider);
-  if (searchQ){const q=searchQ.toLowerCase();base=base.filter(l=>l.model.toLowerCase().includes(q)||l.storage.toLowerCase().includes(q)||l.colors.join(' ').toLowerCase().includes(q));}
-  const cats=[...new Set(base.map(l=>l.category))].sort();
-
-  const fb=document.getElementById('filterbar');
-  fb.innerHTML='';
-
-  cats.forEach(cat=>{
-    const m=CAT_META[cat]||{color:'#a8a8c8',label:cat};
-    const on=fCategory===cat;
-    const btn=document.createElement('button');
-    btn.className='chip'+(on?' on':'');
-    btn.textContent=m.label;
-    btn.style.color=on?'#000':m.color;
-    btn.style.borderColor=m.color+(on?'':'55');
-    if (on) btn.style.background=m.color;
-    btn.onclick=()=>{fCategory=fCategory===cat?'all':cat;renderSidebar();renderFilterBar();renderContent();};
-    fb.appendChild(btn);
-  });
-
-  const sep=document.createElement('div');sep.className='chip-sep';fb.appendChild(sep);
-
-  const sw=document.createElement('div');sw.className='sort-wrap';
-  sw.innerHTML=[['price-asc','$ ↑'],['price-desc','$ ↓'],['az','A–Z']].map(([s,l])=>
-    `<button class="stab ${activeSort===s?'on':''}" data-sort="${s}">${l}</button>`).join('');
-  sw.querySelectorAll('.stab').forEach(b=>{b.onclick=()=>{activeSort=b.dataset.sort;renderFilterBar();renderContent();};});
-  fb.appendChild(sw);
-
-  const vw=document.createElement('div');vw.className='view-btns';
-  vw.innerHTML=[['table','Lista'],['compare','Comparar']].map(([v,l])=>
-    `<button class="vbtn ${activeView===v?'on':''}" data-view="${v}">${l}</button>`).join('');
-  vw.querySelectorAll('.vbtn').forEach(b=>{b.onclick=()=>{activeView=b.dataset.view;renderFilterBar();renderContent();};});
-  fb.appendChild(vw);
-
-  const rc=document.createElement('span');rc.className='rcount';rc.textContent=getFiltered().length+' items';fb.appendChild(rc);
+// ═══════════════════════════════════════
+// RENDER UNIVERSAL
+// ═══════════════════════════════════════
+function getSearch(l) {
+  if (!searchQ) return true;
+  const q=searchQ.toLowerCase();
+  return l.model.toLowerCase().includes(q)||l.provider.toLowerCase().includes(q)||l.storage.toLowerCase().includes(q)||l.colors.join(' ').toLowerCase().includes(q);
 }
 
-// ════════════════════════════════════════
-// RENDER TABLE
-// ════════════════════════════════════════
-function renderTable() {
-  const data=getFiltered();
-  const wrap=document.getElementById('content');
-  if (!data.length){wrap.innerHTML=`<div class="empty"><div class="empty-ico">🔍</div><div class="empty-txt">Sin resultados</div></div>`;return;}
+function renderCatTable(cat, data, keyFn, sortFn, cols) {
+  const wrapId='wrap-'+cat;
+  const wrap=document.getElementById(wrapId);
+  if (!wrap) return;
 
-  const groups={};
-  data.forEach(l=>{
-    const k=l.provider+(l.sheetName?':'+l.sheetName:'');
-    if (!groups[k]) groups[k]={provider:l.provider,name:l.sheetName,items:[]};
-    groups[k].items.push(l);
-  });
+  // Calcular mínimos por key
+  const mins={};
+  data.forEach(l=>{const k=keyFn(l);if(!mins[k]||l.price<mins[k])mins[k]=l.price;});
 
-  wrap.innerHTML=Object.values(groups).map(g=>{
-    const col=provColor(g.provider);
-    const label=g.provider+(g.name?' / '+g.name:'');
-    return `<div class="prov-group">
-      <div class="prov-hdr">
-        <span class="prov-badge" style="background:${col}22;color:${col};border:1px solid ${col}44">${label}</span>
-        <span class="prov-cnt">${g.items.length} productos</span>
-      </div>
-      <table><thead><tr><th>Modelo</th><th>Storage</th><th>Precio USD</th><th>Colores</th><th>Estado</th></tr></thead>
-      <tbody>${g.items.map(l=>{
-        const st=l.status==='STK'?'<span class="tag-stk">STK</span>':l.status==='ING'?'<span class="tag-ing">ING</span>':l.status==='NO'?'<span class="tag-no">NO</span>':'<span class="tag-stk">OK</span>';
-        const sd=l.ram?l.ram+'/'+l.storage:l.storage;
-        const note=l.notes?`<span class="note">${l.notes}</span>`:'';
-        return `<tr><td class="td-model">${l.model}${note}</td><td class="td-storage">${sd}</td><td class="td-price">u$${l.price.toLocaleString('es-AR')}</td><td class="td-colors">${l.colors.slice(0,4).join(', ')}${l.colors.length>4?'…':''}</td><td>${st}</td></tr>`;
-      }).join('')}</tbody></table></div>`;
-  }).join('');
-}
+  // Agrupar por modelo
+  const models=[...new Set(data.map(l=>l.model))];
+  if (cat==='iphone') models.sort((a,b)=>modelRank(a,ORDER_IP)-modelRank(b,ORDER_IP));
+  else if (cat==='samsung') models.sort((a,b)=>modelRank(a,ORDER_SAM)-modelRank(b,ORDER_SAM));
+  else models.sort();
 
-// ════════════════════════════════════════
-// RENDER COMPARE
-// ════════════════════════════════════════
-function renderCompare() {
-  const data=getFiltered();
-  const wrap=document.getElementById('content');
-  if (!data.length){wrap.innerHTML=`<div class="empty"><div class="empty-ico">🔍</div><div class="empty-txt">Sin resultados</div></div>`;return;}
-
-  const provs=[...new Set(data.map(l=>l.provider+(l.sheetName?'/'+l.sheetName:'')))];
-  const byKey={};
-  data.forEach(l=>{
-    const key=l.model+'||'+(l.ram?l.ram+'/':'')+l.storage;
-    if (!byKey[key]) byKey[key]={model:l.model,storage:l.storage,ram:l.ram,pp:{}};
-    const pk=l.provider+(l.sheetName?'/'+l.sheetName:'');
-    if (!byKey[key].pp[pk]||l.price<byKey[key].pp[pk]) byKey[key].pp[pk]=l.price;
-  });
-
-  let rows=Object.values(byKey);
-  if (activeSort==='price-asc') rows.sort((a,b)=>Math.min(...Object.values(a.pp))-Math.min(...Object.values(b.pp)));
-  else if (activeSort==='price-desc') rows.sort((a,b)=>Math.max(...Object.values(b.pp))-Math.max(...Object.values(a.pp)));
-  else rows.sort((a,b)=>a.model.localeCompare(b.model));
-
-  const thProvs=provs.map(p=>{const col=provColor(p.split('/')[0]);return `<th style="color:${col}">${p}</th>`;}).join('');
-  const trows=rows.map(r=>{
-    const key=r.model+'||'+(r.ram?r.ram+'/':'')+r.storage;
-    const prices=provs.map(p=>r.pp[p]||null);
-    const valid=prices.filter(p=>p!==null);
-    const minP=valid.length?Math.min(...valid):0, maxP=valid.length?Math.max(...valid):0;
-    const diff=valid.length>1?maxP-minP:null;
-    const sd=r.ram?r.ram+'/'+r.storage:r.storage;
-    const pCells=prices.map((p,pi)=>{
-      if (!p) return `<td class="cp-na">—</td>`;
-      const cls=valid.length>1?(p===minP?'cp-best':p===maxP?'cp-high':'cp-mid'):'cp-mid';
-      const pk=provs[pi];
-      // Buscar colores y status del listing correspondiente
-      const match=data.find(l=>{
-        const lk=l.provider+(l.sheetName?'/'+l.sheetName:'');
-        const lkey=l.model+'||'+(l.ram?l.ram+'/':'')+l.storage;
-        return lk===pk && lkey===key;
-      });
-      const colors=match?.colors?.slice(0,3).join(', ')||'';
-      const st=match?.status;
-      const stHtml=st==='STK'?'<span class="tag-stk">STK</span>':st==='ING'?'<span class="tag-ing">ING</span>':st==='NO'?'<span class="tag-no">NO</span>':'<span class="tag-stk">OK</span>';
-      return `<td><div class="cp ${cls}">u$${p.toLocaleString('es-AR')} ${stHtml}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${colors}</div></td>`;
-    }).join('');
-    const diffCell=diff!==null?`<td><span class="cdiff">+u$${diff}</span></td>`:`<td class="cp-na">—</td>`;
-    return `<tr><td class="cm">${r.model}</td><td class="cs">${sd}</td>${pCells}${diffCell}</tr>`;
-  }).join('');
-
-  wrap.innerHTML=`<div class="compare-wrap"><table class="ctable">
-    <thead><tr><th>Modelo</th><th>Storage</th>${thProvs}<th>Dif.</th></tr></thead>
-    <tbody>${trows}</tbody></table></div>`;
-}
-
-function renderContent() { activeView==='compare'?renderCompare():renderTable(); }
-function renderAll() { renderSidebar(); renderFilterBar(); renderContent(); }
-
-// ════════════════════════════════════════
-// MODAL SISTEMA
-// ════════════════════════════════════════
-function closeModal() { document.getElementById('overlay').classList.remove('open'); }
-function openModal(title, body, foot) {
-  document.getElementById('mtitle').textContent=title;
-  document.getElementById('mbody').innerHTML=body;
-  document.getElementById('mfoot').innerHTML=foot;
-  document.getElementById('overlay').classList.add('open');
-}
-
-// ════════════════════════════════════════
-// MODAL LOGIN ADMIN
-// ════════════════════════════════════════
-function openLoginModal() {
-  if (isAdmin) { openAdminPanel(); return; }
-  openModal('ACCESO ADMIN',
-    `<div class="fg">
-      <label class="flabel">CLAVE</label>
-      <input class="finput" id="pass-input" type="password" placeholder="••••••" autocomplete="off">
-    </div>
-    <div class="fg">
-      <label class="flabel">GITHUB TOKEN (para guardar datos WA)</label>
-      <input class="finput" id="token-input" type="password" placeholder="ghp_…" autocomplete="off">
-    </div>
-    <div id="login-msg"></div>`,
-    `<button class="btn btn-g" onclick="closeModal()">Cancelar</button>
-     <button class="btn btn-p" onclick="doLogin()">Entrar</button>`
-  );
-  setTimeout(()=>document.getElementById('pass-input').focus(),100);
-}
-
-function doLogin() {
-  const pass = document.getElementById('pass-input').value;
-  const token = document.getElementById('token-input').value;
-  if (pass !== ADMIN_PASS) {
-    document.getElementById('login-msg').innerHTML=`<div class="smsg err">Clave incorrecta.</div>`;
+  if (!models.length) {
+    wrap.innerHTML=`<table><tbody><tr><td class="empty-row" colspan="8">Sin datos. Actualizá el catálogo.</td></tr></tbody></table>`;
     return;
   }
-  GH_TOKEN = token;
-  isAdmin = true;
+
+  const thHtml=cols.map(c=>`<th>${c}</th>`).join('');
+  let html=`<table><thead><tr><th style="width:14px"></th>${thHtml}</tr></thead><tbody>`;
+
+  models.forEach(model=>{
+    const rows=data.filter(l=>l.model===model);
+    rows.sort(sortFn);
+    html+=`<tr class="g"><td colspan="${cols.length+1}">${model}</td></tr>`;
+    rows.forEach(l=>{
+      const k=keyFn(l);
+      const best=l.price===mins[k];
+      const diff=l.price-mins[k];
+      const diffHtml=diff===0?`<span class="ok">mejor precio</span>`:`<span class="dn">+$${diff}</span>`;
+      const storDisp=l.ram?`${l.ram}/${l.storage}`:l.storage;
+      const stBadge=l.status==='STK'?`<span class="stk stk-s">STK</span>`:l.status==='ING'?`<span class="stk stk-i">ING</span>`:l.status==='NO'?`<span class="stk stk-n">NO</span>`:'';
+      const noteBadge=l.notes?`<span class="nc">${l.notes}</span>`:'';
+      const colorsHtml=colorBadge(l.colors.join(', '));
+      html+=`<tr class="${best?'best':''}">
+        <td style="width:14px">${best?`<span class="star">★</span>`:''}</td>
+        <td></td>
+        <td><span style="font-size:12px;color:var(--muted)">${storDisp}</span></td>
+        <td><span class="pb ${badgeCls(l.provider)}">${l.provider}${l.sheetName?' / '+l.sheetName:''}</span></td>
+        <td><span class="pv">USD ${l.price.toLocaleString('es-AR')}</span>${stBadge}</td>
+        <td>${diffHtml}</td>
+        <td>${noteBadge}</td>
+        <td>${colorsHtml}</td>
+      </tr>`;
+    });
+  });
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
+}
+
+function renderCat(cat) {
+  let filt = listings.filter(CAT_MAP[cat]).filter(getSearch);
+
+  if (cat==='iphone') {
+    const m=document.getElementById('fi-model').value;
+    const c=document.getElementById('fi-cap').value;
+    const p=document.getElementById('fi-prov').value;
+    if(m) filt=filt.filter(l=>l.model===m);
+    if(c) filt=filt.filter(l=>l.storage===c);
+    if(p) filt=filt.filter(l=>l.provider===p);
+    renderCatTable(cat,filt,l=>l.model+'|'+l.storage,(a,b)=>capRank(a.storage)-capRank(b.storage)||a.price-b.price,['Modelo','Cap.','Proveedor','Precio','vs mejor','Nota','Colores']);
+  }
+  else if (cat==='samsung') {
+    const m=document.getElementById('fs-model').value;
+    const p=document.getElementById('fs-prov').value;
+    if(m) filt=filt.filter(l=>l.model===m);
+    if(p) filt=filt.filter(l=>l.provider===p);
+    renderCatTable(cat,filt,l=>l.model+'|'+l.storage,(a,b)=>capRank(a.storage)-capRank(b.storage)||a.price-b.price,['Modelo','Cap.','Proveedor','Precio','vs mejor','Nota','Colores']);
+  }
+  else if (cat==='google') {
+    const p=document.getElementById('fg-prov').value;
+    if(p) filt=filt.filter(l=>l.provider===p);
+    renderCatTable(cat,filt,l=>l.model+'|'+l.storage,(a,b)=>a.price-b.price,['Modelo','Cap.','Proveedor','Precio','vs mejor','Nota','Colores']);
+  }
+  else if (cat==='mac') {
+    const m=document.getElementById('fm-model').value;
+    const p=document.getElementById('fm-prov').value;
+    if(m) filt=filt.filter(l=>l.model===m);
+    if(p) filt=filt.filter(l=>l.provider===p);
+    renderCatTable(cat,filt,l=>l.model+'|'+l.storage,(a,b)=>a.price-b.price,['Modelo','Specs','Proveedor','Precio','vs mejor','Nota','Colores']);
+  }
+  else {
+    const provSelId={'ipad':'fp-prov','watch':'fw-prov','airpods':'fa-prov','laptop':'fl-prov','acc':'fac-prov'}[cat];
+    const p=provSelId?document.getElementById(provSelId).value:'';
+    if(p) filt=filt.filter(l=>l.provider===p);
+    renderCatTable(cat,filt,l=>l.model+'|'+l.storage,(a,b)=>a.price-b.price,['Modelo','Cap.','Proveedor','Precio','vs mejor','Nota','Colores']);
+  }
+}
+
+function renderAll() {
+  ['iphone','samsung','google','mac','ipad','watch','airpods','laptop','acc'].forEach(renderCat);
+}
+
+// ═══════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════
+function showTab(id, btn) {
+  document.querySelectorAll('.sec').forEach(s=>s.style.display='none');
+  document.querySelectorAll('.sec.on').forEach(s=>s.classList.remove('on'));
+  const sec=document.getElementById('sec-'+id);
+  if(sec){sec.style.display='';sec.classList.add('on');}
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  activeTab=id;
+}
+// Init: hide all except iphone
+document.querySelectorAll('.sec').forEach((s,i)=>{if(i>0)s.style.display='none';});
+
+// ═══════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════
+document.getElementById('searchInput').addEventListener('input', e=>{
+  searchQ=e.target.value.trim();
+  renderAll();
+});
+
+// ═══════════════════════════════════════
+// ADMIN: LOGIN
+// ═══════════════════════════════════════
+function openLoginModal() {
+  if (isAdmin) return;
+  document.getElementById('mtitle').textContent='ACCESO ADMIN';
+  document.getElementById('mbody').innerHTML=`
+    <div class="fg"><label class="flabel">CLAVE</label><input class="finput" id="pi" type="password" placeholder="••••••" autocomplete="off"></div>
+    <div class="fg"><label class="flabel">GITHUB TOKEN</label><input class="finput" id="ti" type="password" placeholder="ghp_…" autocomplete="off"></div>
+    <div id="lmsg"></div>`;
+  document.getElementById('mfoot').innerHTML=`
+    <button class="btn btn-g" onclick="closeModal()">Cancelar</button>
+    <button class="btn btn-p" onclick="doLogin()">Entrar</button>`;
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('pi').focus(),100);
+}
+function doLogin() {
+  const pass=document.getElementById('pi').value;
+  const token=document.getElementById('ti').value;
+  if (pass!==ADMIN_PASS) { document.getElementById('lmsg').innerHTML=`<div class="smsg err">Clave incorrecta.</div>`; return; }
+  GH_TOKEN=token; isAdmin=true;
   document.getElementById('adminBadge').style.display='inline';
   document.getElementById('adminBtn').style.display='inline-flex';
+  document.getElementById('adminTab').style.display='';
   document.getElementById('loginBtn').style.display='none';
   closeModal();
 }
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
 
-// ════════════════════════════════════════
-// MODAL ADMIN — cargar WA
-// ════════════════════════════════════════
-function openAdminModal() {
-  openModal('CARGAR WHATSAPP',
-    `<div class="fg">
-      <label class="flabel">PROVEEDOR</label>
-      <select class="fselect" id="wa-prov">
-        <option value="SVET">SVET</option>
-        <option value="JULIAN">JULIAN</option>
-        <option value="NUEVO">Nuevo…</option>
-      </select>
-    </div>
-    <div class="fg" id="wa-nw" style="display:none">
-      <label class="flabel">NOMBRE</label>
-      <input class="finput" id="wa-nm" placeholder="Ej: MARCOS">
-    </div>
-    <div class="fg">
-      <label class="flabel">TEXTO DE WHATSAPP</label>
-      <textarea class="ftextarea" id="wa-text" placeholder="Pegá el mensaje completo…"></textarea>
-    </div>
-    <div id="wa-prev"></div>`,
-    `<button class="btn btn-g" onclick="previewWA()">Vista previa</button>
-     <button class="btn btn-o" onclick="clearProvWA()" style="margin-right:auto">🗑 Limpiar proveedor</button>
-     <button class="btn btn-p" onclick="importWA()">Guardar en Gist</button>`
-  );
-  document.getElementById('wa-prov').onchange=e=>
-    document.getElementById('wa-nw').style.display=e.target.value==='NUEVO'?'block':'none';
-}
-
-function getWAProv() {
-  const v=document.getElementById('wa-prov').value;
-  return v==='NUEVO'?(document.getElementById('wa-nm').value||'NUEVO').toUpperCase():v;
-}
-
-function previewWA() {
-  const prov=getWAProv(), text=document.getElementById('wa-text').value;
-  if (!text.trim()) return;
-  const parsed=parseWhatsApp(text,prov);
-  const prev=document.getElementById('wa-prev');
-  if (!parsed.length){prev.innerHTML=`<div class="smsg err">Sin productos detectados.</div>`;return;}
-  let html=`<div class="prevbox">`;
-  parsed.slice(0,15).forEach(p=>{
-    html+=`<div class="prow"><span class="pok">✓</span><span class="pf">${p.provider}</span><span>${p.model}</span><span class="pf" style="min-width:65px">${p.storage}</span><span style="color:var(--accent)">u$${p.price}</span></div>`;
-  });
-  if (parsed.length>15) html+=`<div style="color:var(--dim);padding:2px 0">…y ${parsed.length-15} más</div>`;
-  html+=`</div><div class="smsg info">${parsed.length} productos detectados.</div>`;
-  prev.innerHTML=html;
-}
-
-async function importWA() {
-  const prov=getWAProv(), text=document.getElementById('wa-text').value;
-  if (!text.trim()) return;
-  const parsed=parseWhatsApp(text,prov);
-  if (!parsed.length){document.getElementById('wa-prev').innerHTML=`<div class="smsg err">Sin productos.</div>`;return;}
-
-  document.getElementById('wa-prev').innerHTML=`<div class="smsg info">Guardando en Gist…</div>`;
-
+// ═══════════════════════════════════════
+// ADMIN: GUARDAR WA
+// ═══════════════════════════════════════
+async function saveAllWA() {
+  const btn=document.getElementById('saveBtn');
+  const msg=document.getElementById('admin-msg');
+  btn.disabled=true; btn.textContent='Guardando…';
   try {
-    // Leer WA actuales del Gist, reemplazar proveedor, guardar
-    const current = await readGist();
-    const updated = current.filter(l=>l.provider!==prov);
-    updated.push(...parsed);
-    await writeGist(updated);
-
-    // Actualizar listings locales
-    listings = listings.filter(l=>l.provider!==prov);
-    listings.push(...parsed);
-    renderAll();
-    document.getElementById('wa-prev').innerHTML=`<div class="smsg ok">✓ ${parsed.length} productos guardados. Todos los vendedores verán los cambios al actualizar.</div>`;
-    setTimeout(closeModal,1500);
-  } catch(e) {
-    document.getElementById('wa-prev').innerHTML=`<div class="smsg err">✗ Error: ${e.message}</div>`;
-  }
-}
-
-async function clearProvWA() {
-  const prov=getWAProv();
-  if (!confirm(`¿Eliminar todos los productos de ${prov} del Gist?`)) return;
-  try {
+    const svetText=document.getElementById('txt-svet').value;
+    const julianText=document.getElementById('txt-julian').value;
+    let newItems=[];
+    if (svetText.trim()) newItems.push(...parseWhatsApp(svetText,'SVET'));
+    if (julianText.trim()) newItems.push(...parseWhatsApp(julianText,'JULIAN'));
+    if (!newItems.length) { msg.innerHTML=`<div class="smsg err">Sin productos detectados.</div>`; return; }
+    // Leer Gist actual, reemplazar SVET y JULIAN, guardar
     const current=await readGist();
-    const updated=current.filter(l=>l.provider!==prov);
+    const provs=new Set(newItems.map(l=>l.provider));
+    const updated=[...current.filter(l=>!provs.has(l.provider)),...newItems];
     await writeGist(updated);
-    listings=listings.filter(l=>l.provider!==prov);
-    renderAll();
-    document.getElementById('wa-prev').innerHTML=`<div class="smsg ok">✓ Datos de ${prov} eliminados.</div>`;
+    listings=listings.filter(l=>!provs.has(l.provider));
+    listings.push(...newItems);
+    buildFilters(); renderAll();
+    msg.innerHTML=`<div class="smsg ok">✓ ${newItems.length} productos guardados. Vendedores verán los cambios al actualizar.</div>`;
   } catch(e) {
-    document.getElementById('wa-prev').innerHTML=`<div class="smsg err">✗ ${e.message}</div>`;
+    msg.innerHTML=`<div class="smsg err">✗ ${e.message}</div>`;
+  }
+  btn.disabled=false; btn.textContent='Guardar en Gist';
+}
+
+async function clearAllWA() {
+  if (!confirm('¿Limpiar todos los datos de WhatsApp del Gist?')) return;
+  try {
+    await writeGist([]);
+    listings=listings.filter(l=>l.provider==='SHEET');
+    buildFilters(); renderAll();
+    document.getElementById('admin-msg').innerHTML=`<div class="smsg ok">✓ Datos WA eliminados.</div>`;
+  } catch(e) {
+    document.getElementById('admin-msg').innerHTML=`<div class="smsg err">✗ ${e.message}</div>`;
   }
 }
 
-// ════════════════════════════════════════
-// EVENTOS
-// ════════════════════════════════════════
-document.getElementById('searchInput').addEventListener('input', e=>{
-  searchQ=e.target.value.trim();
-  renderSidebar(); renderFilterBar(); renderContent();
-});
-document.getElementById('overlay').addEventListener('click', e=>{
-  if (e.target===document.getElementById('overlay')) closeModal();
-});
-
-// ════════════════════════════════════════
+// ═══════════════════════════════════════
 // INIT
-// ════════════════════════════════════════
-initTheme();
+// ═══════════════════════════════════════
 refreshAll();
 </script>
 </body>
