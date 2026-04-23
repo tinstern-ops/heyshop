@@ -276,7 +276,7 @@ td{padding:7px 8px;vertical-align:middle;}
 const CF_WORKER    = 'https://sweet-thunder-5881.tinstern.workers.dev';
 const GIST_ID      = '5d9214407b592fc64f057d25aaa9cab9';
 const GIST_FILE    = 'priceboard-wa.json';
-const ADMIN_PASS   = '@SEBImiaMaia25'; // ← reemplazá esto antes de subir
+const ADMIN_PASS   = 'TU_CLAVE_ADMIN'; // ← reemplazá esto antes de subir
 
 // GitHub token: solo el admin lo ingresa en runtime, no va hardcodeado
 let GH_TOKEN = '';
@@ -352,6 +352,8 @@ function uid() { return (++_uid).toString(36); }
 
 function detectCat(name) {
   const u = name.toUpperCase();
+  // Accesorios primero — antes de iPhone para evitar falsos positivos
+  if (/VIDRIO|GLASS|PROTECTOR|FUNDA|SPIGEN|CABLE|CARGADOR|AIRTAG|PENCIL|MAGSAFE|CASE|COVER/.test(u)) return 'Accesorio';
   if (/IPHONE/.test(u)) return 'iPhone';
   if (/SAMSUNG|GALAXY|S2\d|S1\d/.test(u)) return 'Samsung';
   if (/PIXEL|GOOGLE/.test(u)) return 'Google';
@@ -361,6 +363,46 @@ function detectCat(name) {
   if (/MACBOOK/.test(u)) return 'Mac';
   if (/LENOVO|ASUS|HP |ACER|MSI|DELL|LAPTOP/.test(u)) return 'Laptop';
   return 'Accesorio';
+}
+// ════════════════════════════════════════
+// NORMALIZAR NOMBRE DE MODELO
+// ════════════════════════════════════════
+function normalizeModel(raw) {
+  let s = raw.toUpperCase().trim();
+
+  // Strip paréntesis y su contenido: (esim), (sim + esim), (open box), etc.
+  s = s.replace(/\s*\([^)]*\)/g, '').trim();
+
+  // Strip emojis y símbolos residuales
+  s = s.replace(/[^ -~]/g, '').trim();
+
+  // Strip marcadores de condición al final
+  s = s.replace(/\s*(NEW|ACTIVATED|OPEN BOX|SIN PRECINTOS|EUROPEO|REBAJA)\s*$/i, '').trim();
+
+  // Normalizar espacios
+  s = s.replace(/\s+/g, ' ').trim();
+
+  // ── iPhone ──
+  // "IPHONE 16 E" → "IPHONE 16E"
+  s = s.replace(/IPHONE\s+(\d+)\s+E/, 'IPHONE $1E');
+  // "IPHONE16E" → "IPHONE 16E" (sin espacio entre marca y número)
+  s = s.replace(/IPHONE(\d+)/, 'IPHONE $1');
+  // Normalizar sufijos
+  s = s.replace(/PRO\s+MAX/, 'PRO MAX');
+  s = s.replace(/PRO MAX/, 'PRO MAX');
+  s = s.replace(/PLUS/, 'PLUS');
+  s = s.replace(/ULTRA/, 'ULTRA');
+
+  // ── Samsung ──
+  // "S26 PLUS" → "SAMSUNG S26 PLUS" si no tiene prefijo
+  if (/^S\d{2}/.test(s) && !/^SAMSUNG/.test(s)) s = 'SAMSUNG ' + s;
+  // "GALAXY S26" → "SAMSUNG S26"
+  s = s.replace(/^GALAXY\s+/, 'SAMSUNG ');
+
+  // ── Google ──
+  s = s.replace(/^GOOGLE\s+PIXEL/, 'PIXEL');
+
+  return s.trim();
 }
 
 function parseCSVLine(line) {
@@ -450,7 +492,7 @@ function parseWhatsApp(text, prov) {
     if (!line) continue;
 
     if (reModel.test(line)&&!reStorFst.test(line)&&!reSamsungL.test(line)) {
-      model=line.replace(/[^a-zA-Z0-9\s\-\/""]+/g,'').trim().toUpperCase();
+      model=normalizeModel(line.replace(/[^a-zA-Z0-9\s\-\/""()]+/g,'').trim());
       cat=detectCat(model);
       continue;
     }
@@ -733,15 +775,26 @@ function renderCompare() {
 
   const thProvs=provs.map(p=>{const col=provColor(p.split('/')[0]);return `<th style="color:${col}">${p}</th>`;}).join('');
   const trows=rows.map(r=>{
+    const key=r.model+'||'+(r.ram?r.ram+'/':'')+r.storage;
     const prices=provs.map(p=>r.pp[p]||null);
     const valid=prices.filter(p=>p!==null);
     const minP=valid.length?Math.min(...valid):0, maxP=valid.length?Math.max(...valid):0;
     const diff=valid.length>1?maxP-minP:null;
     const sd=r.ram?r.ram+'/'+r.storage:r.storage;
-    const pCells=prices.map(p=>{
+    const pCells=prices.map((p,pi)=>{
       if (!p) return `<td class="cp-na">—</td>`;
       const cls=valid.length>1?(p===minP?'cp-best':p===maxP?'cp-high':'cp-mid'):'cp-mid';
-      return `<td class="cp ${cls}">u$${p.toLocaleString('es-AR')}</td>`;
+      const pk=provs[pi];
+      // Buscar colores y status del listing correspondiente
+      const match=data.find(l=>{
+        const lk=l.provider+(l.sheetName?'/'+l.sheetName:'');
+        const lkey=l.model+'||'+(l.ram?l.ram+'/':'')+l.storage;
+        return lk===pk && lkey===key;
+      });
+      const colors=match?.colors?.slice(0,3).join(', ')||'';
+      const st=match?.status;
+      const stHtml=st==='STK'?'<span class="tag-stk">STK</span>':st==='ING'?'<span class="tag-ing">ING</span>':st==='NO'?'<span class="tag-no">NO</span>':'<span class="tag-stk">OK</span>';
+      return `<td><div class="cp ${cls}">u$${p.toLocaleString('es-AR')} ${stHtml}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${colors}</div></td>`;
     }).join('');
     const diffCell=diff!==null?`<td><span class="cdiff">+u$${diff}</span></td>`:`<td class="cp-na">—</td>`;
     return `<tr><td class="cm">${r.model}</td><td class="cs">${sd}</td>${pCells}${diffCell}</tr>`;
