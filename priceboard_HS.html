@@ -335,6 +335,19 @@ const GIST_ID    = '5d9214407b592fc64f057d25aaa9cab9';
 const GIST_FILE  = 'priceboard-wa.json';
 const ADMIN_PASS = 'TU_CLAVE_ADMIN'; // ← reemplazá antes de subir
 
+// Descuentos por proveedor y categoría (en USD)
+// Editá estos valores cuando cambien los acuerdos
+const DESCUENTOS = {
+  SVET:   { iPhone: 10, Samsung: 0, Google: 0, Mac: 0, iPad: 0, Watch: 0, AirPods: 0, Laptop: 0, Accesorio: 0 },
+  JULIAN: { iPhone: 5,  Samsung: 0, Google: 5, Mac: 0, iPad: 0, Watch: 0, AirPods: 0, Laptop: 0, Accesorio: 0 },
+  MAURO:  { iPhone: 0,  Samsung: 0, Google: 0, Mac: 0, iPad: 0, Watch: 0, AirPods: 0, Laptop: 0, Accesorio: 0 },
+};
+function getDescuento(provider, category) {
+  const prov = DESCUENTOS[provider] || DESCUENTOS[provider?.toUpperCase()];
+  if (!prov) return 0;
+  return prov[category] || 0;
+}
+
 const SHEETS_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQQa-sWggZMfzoz1anCTUkqrVEDsRO7rzWJx_OVNOcbHlJugZQjufDldrolxV3qwfmz2LYehX4c736E/pub?output=csv&gid=';
 
 const SHEETS = [
@@ -371,11 +384,11 @@ function capRank(c) {
 }
 
 // Provider badge CSS classes
-const BADGE = {SVET:'ps',JULIAN:'pj',JULIÁN:'pj',SHEET:'psh',MAURO:'pm',DEFAULT:'psh'};
+const BADGE = {SVET:'ps',JULIAN:'pj',JULIÁN:'pj',SHEET:'pm',MAURO:'pm',DEFAULT:'psh'};
 function badgeCls(p) { return BADGE[p] || BADGE.DEFAULT; }
 
 // Provider colors for legend dots
-const PROV_COLORS = {SVET:'#1d4ed8',JULIAN:'#ea580c',JULIÁN:'#ea580c',SHEET:'#7c3aed'};
+const PROV_COLORS = {SVET:'#1d4ed8',JULIAN:'#ea580c',JULIÁN:'#ea580c',SHEET:'#16a34a',MAURO:'#16a34a'};
 function provColor(p) { return PROV_COLORS[p] || '#888'; }
 
 // ═══════════════════════════════════════
@@ -468,24 +481,31 @@ function updateTs() {
 // ═══════════════════════════════════════
 function normalizeModel(raw) {
   let s = raw.toUpperCase().trim();
-  s = s.replace(/["\']/g, '');
+  // Strip emojis y no-ASCII primero
+  s = s.replace(/[^ -~]/g, ' ').trim();
+  // Strip asteriscos, comillas, puntos extra
+  s = s.replace(/[*"'`]/g, ' ');
+  // Strip paréntesis y contenido
   s = s.replace(/\s*\([^)]*\)/g, '').trim();
-  s = s.replace(/[^\x20-\x7E]/g, '').trim();
+  // Strip marcadores al final
   s = s.replace(/\s*(NEW|ACTIVATED|OPEN BOX|SIN PRECINTOS|EUROPEO|REBAJA|SIM\s*\+\s*ESIM|ESIM|ONLY ESIM)\s*$/i, '').trim();
   s = s.replace(/\s+/g, ' ').trim();
 
-  // iPhone: normalizar 17 "E", 17 E, 17E → IPHONE 17E
-  s = s.replace(/IPHONE\s*([\d]+)\s*["']?E["']?\b/, 'IPHONE $1E');
+  // ── iPhone: normalizar todas las variantes de "E" ──
+  // "17 E", "17  E", "17 " E "", "17E" → todos a "17E"
+  s = s.replace(/IPHONE\s*(\d+)\s+E\b/, 'IPHONE $1E');
+  s = s.replace(/IPHONE\s*(\d+)E\b/, 'IPHONE $1E');
+  // "IPHONE16" → "IPHONE 16"
   s = s.replace(/IPHONE(\d)/, 'IPHONE $1');
   s = s.replace(/\bPRO\s*MAX\b/g, 'PRO MAX');
 
-  // Samsung: quitar RAM del nombre
+  // ── Samsung: quitar RAM del nombre ──
   const smInternal = s.match(/\bS(\d{2})\b\s*(ULTRA|PLUS|FE|EDGE)?/g);
-  if (/^SM\s*[-–]/.test(s) && smInternal) {
+  if (/^SM\s*[-]/.test(s) && smInternal) {
     for (const m of smInternal) {
-      const nm = m.match(/S(\d{2})\s*(ULTRA|PLUS|FE|EDGE)?/);
-      if (nm && parseInt(nm[1]) >= 20) {
-        s = 'SAMSUNG S' + nm[1] + (nm[2] ? ' ' + nm[2] : '');
+      const nm2 = m.match(/S(\d{2})\s*(ULTRA|PLUS|FE|EDGE)?/);
+      if (nm2 && parseInt(nm2[1]) >= 20) {
+        s = 'SAMSUNG S' + nm2[1] + (nm2[2] ? ' ' + nm2[2] : '');
         break;
       }
     }
@@ -495,7 +515,7 @@ function normalizeModel(raw) {
   if (/^SAMSUNG/.test(s)) {
     s = s.replace(/\s+(BLACK|WHITE|BLUE|VIOLET|SILVER|GRAY|GREY|PINK|GREEN|GOLD|TITANIUM|LAVENDER|TEAL|ORANGE|PURPLE|GRAPHITE|NAVY|ICE|JET).*$/i, '');
   }
-  s = s.replace(/\s+\d+\s*\+\s*$/,'').replace(/\s+\d+\s*$/,'').trim();
+  s = s.replace(/\s+\d+\s*\+\s*$/, '').replace(/\s+\d+\s*$/, '').trim();
   if (/^S\d{2}/.test(s) && !/^SAMSUNG/.test(s)) s = 'SAMSUNG ' + s;
   s = s.replace(/^GALAXY\s+/, 'SAMSUNG ');
   s = s.replace(/^GOOGLE\s+PIXEL/, 'PIXEL');
@@ -574,7 +594,7 @@ function parseSheetCSV(csvText, sheetName) {
       if (!model) continue;
       const normModel = normalizeModel(model);
       const status = (col3||'STK').toUpperCase().trim();
-      items.push({id:uid(),provider:'SHEET',sheetName,category:detectCat(normModel),model:normModel,storage,ram,price,currency:'USD',colors,status:status==='NO'?'NO':status==='ING'?'ING':'STK',notes:''});
+      items.push({id:uid(),provider:'MAURO',sheetName,category:detectCat(normModel),model:normModel,storage,ram,price,currency:'USD',colors,status:status==='NO'?'NO':status==='ING'?'ING':'STK',notes:''});
     } else if (!col2) {
       curModel = col1.toUpperCase().trim();
     }
@@ -744,7 +764,7 @@ function renderCatTable(cat, data, keyFn, sortFn, cols) {
 
   // Calcular mínimos por key
   const mins={};
-  data.forEach(l=>{const k=keyFn(l);if(!mins[k]||l.price<mins[k])mins[k]=l.price;});
+  data.forEach(l=>{const d=getDescuento(l.provider,l.category);const fp=l.price-d;const k=keyFn(l);if(!mins[k]||fp<mins[k])mins[k]=fp;});
 
   // Agrupar por modelo
   const models=[...new Set(data.map(l=>l.model))];
@@ -766,19 +786,24 @@ function renderCatTable(cat, data, keyFn, sortFn, cols) {
     html+=`<tr class="g"><td colspan="${cols.length+1}">${model}</td></tr>`;
     rows.forEach(l=>{
       const k=keyFn(l);
-      const best=l.price===mins[k];
-      const diff=l.price-mins[k];
+      const desc = getDescuento(l.provider, l.category);
+      const finalPrice = l.price - desc;
+      const best=finalPrice===mins[k];
+      const diff=finalPrice-mins[k];
       const diffHtml=diff===0?`<span class="ok">mejor precio</span>`:`<span class="dn">+$${diff}</span>`;
       const storDisp=l.ram?`${l.ram}/${l.storage}`:l.storage;
       const stBadge=l.status==='STK'?`<span class="stk stk-s">STK</span>`:l.status==='ING'?`<span class="stk stk-i">ING</span>`:l.status==='NO'?`<span class="stk stk-n">NO</span>`:'';
       const noteBadge=l.notes?`<span class="nc">${l.notes}</span>`:'';
       const colorsHtml=colorBadge(l.colors.join(', '));
+      const precioHtml=desc>0
+        ? `<span class="lp">$${l.price}</span><span class="pv">USD ${finalPrice.toLocaleString('es-AR')}</span>`
+        : `<span class="pv">USD ${finalPrice.toLocaleString('es-AR')}</span>`;
       html+=`<tr class="${best?'best':''}">
         <td style="width:14px">${best?`<span class="star">★</span>`:''}</td>
         <td></td>
         <td><span style="font-size:12px;color:var(--muted)">${storDisp}</span></td>
         <td><span class="pb ${badgeCls(l.provider)}">${l.provider}${l.sheetName?' / '+l.sheetName:''}</span></td>
-        <td><span class="pv">USD ${l.price.toLocaleString('es-AR')}</span>${stBadge}</td>
+        <td>${precioHtml}${stBadge}</td>
         <td>${diffHtml}</td>
         <td>${noteBadge}</td>
         <td>${colorsHtml}</td>
@@ -901,7 +926,7 @@ async function saveAllWA() {
     // Leer Gist actual, reemplazar SVET y JULIAN, guardar
     const current=await readGist();
     const provs=new Set(newItems.map(l=>l.provider));
-    const updated=[...current.filter(l=>!provs.has(l.provider)),...newItems];
+    const updated=[...current.filter(l=>!provs.has(l.provider)||l.provider==='MAURO'),...newItems];
     await writeGist(updated);
     listings=listings.filter(l=>!provs.has(l.provider));
     listings.push(...newItems);
