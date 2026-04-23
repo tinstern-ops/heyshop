@@ -333,14 +333,14 @@ tr.best .pv{color:var(--best-text);font-weight:700;}
 const CF_WORKER  = 'https://sweet-thunder-5881.tinstern.workers.dev';
 const GIST_ID    = '5d9214407b592fc64f057d25aaa9cab9';
 const GIST_FILE  = 'priceboard-wa.json';
-const ADMIN_PASS = '@SEBImiaMaia25'; // ← reemplazá antes de subir
+const ADMIN_PASS = 'TU_CLAVE_ADMIN'; // ← reemplazá antes de subir
 
 // Descuentos por proveedor y categoría (en USD)
 // Editá estos valores cuando cambien los acuerdos
 const DESCUENTOS = {
   SVET:   { iPhone: 10, Samsung: 0, Google: 0, Mac: 0, iPad: 0, Watch: 0, AirPods: 0, Laptop: 0, Accesorio: 0 },
   JULIAN: { iPhone: 5,  Samsung: 0, Google: 5, Mac: 0, iPad: 0, Watch: 0, AirPods: 0, Laptop: 0, Accesorio: 0 },
-  MAURO:  { iPhone: 0, iPhonepro: 20, iPhonepromax: 20,  Samsung: 0, Google: 0, Mac: 0, iPad: 0, Watch: 0, AirPods: 0, Laptop: 0, Accesorio: 0 },
+  MAURO:  { iPhone: 0,  Samsung: 0, Google: 0, Mac: 0, iPad: 0, Watch: 0, AirPods: 0, Laptop: 0, Accesorio: 0 },
 };
 function getDescuento(provider, category) {
   const prov = DESCUENTOS[provider] || DESCUENTOS[provider?.toUpperCase()];
@@ -515,7 +515,10 @@ function normalizeModel(raw) {
   if (/^SAMSUNG/.test(s)) {
     s = s.replace(/\s+(BLACK|WHITE|BLUE|VIOLET|SILVER|GRAY|GREY|PINK|GREEN|GOLD|TITANIUM|LAVENDER|TEAL|ORANGE|PURPLE|GRAPHITE|NAVY|ICE|JET).*$/i, '');
   }
-  s = s.replace(/\s+\d+\s*\+\s*$/, '').replace(/\s+\d+\s*$/, '').trim();
+  // Strip trailing numbers solo para Samsung (evita borrar "IPHONE 15" → "IPHONE")
+  if (/^SAMSUNG|^S\d{2}/.test(s)) {
+    s = s.replace(/\s+\d+\s*\+\s*$/, '').replace(/\s+\d+\s*$/, '').trim();
+  }
   if (/^S\d{2}/.test(s) && !/^SAMSUNG/.test(s)) s = 'SAMSUNG ' + s;
   s = s.replace(/^GALAXY\s+/, 'SAMSUNG ');
   s = s.replace(/^GOOGLE\s+PIXEL/, 'PIXEL');
