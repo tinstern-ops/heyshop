@@ -353,6 +353,23 @@ tr.best .pv{color:var(--best-text);font-weight:700;}
         <button class="btn btn-p" onclick="saveAllWA()" id="saveBtn">Guardar en Gist</button>
       </div>
       <div id="admin-msg"></div>
+
+      <!-- DESCUENTOS -->
+      <div class="carga-sec" style="margin-top:24px">
+        <h2>💰 Descuentos por proveedor y modelo</h2>
+        <div class="info-box" style="margin-bottom:12px">
+          Definí cuánto descuenta cada proveedor por modelo específico (en USD). Solo completá los modelos con descuento — el resto es 0 por defecto.
+        </div>
+        <div id="desc-editor"></div>
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+          <select id="desc-new-prov" style="height:32px;padding:0 8px;border:1px solid var(--border);border-radius:4px;background:var(--s1);color:var(--text);font-size:12px">
+            <option value="">Seleccionar proveedor…</option>
+          </select>
+          <button class="btn btn-g" onclick="addDescProv()">+ Agregar proveedor</button>
+          <button class="btn btn-p" id="saveDescBtn" onclick="saveDescuentos()" style="margin-left:auto">💾 Guardar descuentos</button>
+        </div>
+        <div id="desc-msg"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -376,19 +393,36 @@ tr.best .pv{color:var(--best-text);font-weight:700;}
 const CF_WORKER  = 'https://sweet-thunder-5881.tinstern.workers.dev';
 const GIST_ID    = '5d9214407b592fc64f057d25aaa9cab9';
 const GIST_FILE  = 'priceboard-wa.json';
-const ADMIN_PASS = '@SEBImiaMaia25'; // ← reemplazá antes de subir
+const ADMIN_PASS = 'TU_CLAVE_ADMIN'; // ← reemplazá antes de subir
 
-// Descuentos por proveedor y categoría (en USD)
-// Editá estos valores cuando cambien los acuerdos
-const DESCUENTOS = {
-  SVET:   { iPhone: 10, Samsung: 0, Google: 0, Mac: 0, iPad: 0, Watch: 0, AirPods: 0, Laptop: 0, Accesorio: 0 },
-  JULIAN: { iPhone: 5,  Samsung: 0, Google: 5, Mac: 0, iPad: 0, Watch: 0, AirPods: 0, Laptop: 0, Accesorio: 0 },
-  MAURO:  { iPhone: 0,  Samsung: 0, Google: 0, Mac: 0, iPad: 0, Watch: 0, AirPods: 0, Laptop: 0, Accesorio: 0 },
-};
-function getDescuento(provider, category) {
-  const prov = DESCUENTOS[provider] || DESCUENTOS[provider?.toUpperCase()];
-  if (!prov) return 0;
-  return prov[category] || 0;
+// Descuentos: se cargan del Gist, estructura { PROVEEDOR: { "Modelo": monto } }
+let DESCUENTOS = {};
+const GIST_DESC_FILE = 'priceboard-descuentos.json';
+
+function getDescuento(provider, model) {
+  const prov = DESCUENTOS[provider] || DESCUENTOS[provider?.toUpperCase()] || {};
+  return prov[model] || 0;
+}
+
+async function readDescuentos() {
+  try {
+    const res = await fetch(`https://api.github.com/gists/${GIST_ID}`,{headers:{'Accept':'application/vnd.github+json'}});
+    if (!res.ok) return {};
+    const data = await res.json();
+    const content = data.files?.[GIST_DESC_FILE]?.content;
+    if (!content) return {};
+    return JSON.parse(content);
+  } catch(e) { return {}; }
+}
+
+async function writeDescuentos(obj) {
+  if (!GH_TOKEN) throw new Error('Sin token');
+  const res = await fetch(`https://api.github.com/gists/${GIST_ID}`,{
+    method:'PATCH',
+    headers:{'Authorization':'Bearer '+GH_TOKEN,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+    body: JSON.stringify({files:{[GIST_DESC_FILE]:{content:JSON.stringify(obj,null,2)}}})
+  });
+  if (!res.ok) { const e=await res.json(); throw new Error(e.message||'Error Gist'); }
 }
 
 const SHEETS_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQQa-sWggZMfzoz1anCTUkqrVEDsRO7rzWJx_OVNOcbHlJugZQjufDldrolxV3qwfmz2LYehX4c736E/pub?output=csv&gid=';
@@ -832,6 +866,7 @@ async function refreshAll() {
   }
   bar.style.width='88%';
   const waItems = await readGist();
+  DESCUENTOS = await readDescuentos();
   listings = [...items, ...waItems];
   bar.style.width='100%';
   updateTs();
@@ -891,7 +926,7 @@ function renderCatTable(cat, data, keyFn, sortFn, cols) {
 
   // Calcular mínimos por key
   const mins={};
-  data.forEach(l=>{const d=getDescuento(l.provider,l.category);const fp=l.price-d;const k=keyFn(l);if(!mins[k]||fp<mins[k])mins[k]=fp;});
+  data.forEach(l=>{const d=getDescuento(l.provider,l.model);const fp=l.price-d;const k=keyFn(l);if(!mins[k]||fp<mins[k])mins[k]=fp;});
 
   // Agrupar por modelo
   const models=[...new Set(data.map(l=>l.model))];
@@ -913,7 +948,7 @@ function renderCatTable(cat, data, keyFn, sortFn, cols) {
     html+=`<tr class="g"><td colspan="${cols.length+1}">${model}</td></tr>`;
     rows.forEach(l=>{
       const k=keyFn(l);
-      const desc = getDescuento(l.provider, l.category);
+      const desc = getDescuento(l.provider, l.model);
       const finalPrice = l.price - desc;
       const best=finalPrice===mins[k];
       const diff=finalPrice-mins[k];
@@ -1169,6 +1204,155 @@ async function clearAllWA() {
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
+// ═══════════════════════════════════════
+// EDITOR DE DESCUENTOS
+// ═══════════════════════════════════════
+// Estado local del editor (se sincroniza con DESCUENTOS al guardar)
+let descEdit = {};
+
+function initDescEditor() {
+  // Clonar DESCUENTOS actual al editor
+  descEdit = JSON.parse(JSON.stringify(DESCUENTOS));
+  renderDescEditor();
+  // Poblar select de proveedores con los que ya existen en listings
+  const allProvs = [...new Set(listings.filter(l=>l.condition!=='used').map(l=>l.provider))].sort();
+  const sel = document.getElementById('desc-new-prov');
+  if (sel) {
+    sel.innerHTML = '<option value="">Seleccionar proveedor…</option>' +
+      allProvs.map(p=>`<option value="${p}">${p}</option>`).join('');
+  }
+}
+
+function renderDescEditor() {
+  const wrap = document.getElementById('desc-editor');
+  if (!wrap) return;
+
+  // Todos los modelos disponibles en listings (nuevos)
+  const allModels = [...new Set(listings.filter(l=>l.condition!=='used').map(l=>l.model))].sort((a,b)=>{
+    const oi = ORDER_IP.indexOf(a), oj = ORDER_IP.indexOf(b);
+    if (oi>=0&&oj>=0) return oi-oj;
+    if (oi>=0) return -1; if (oj>=0) return 1;
+    return a.localeCompare(b);
+  });
+
+  const provs = Object.keys(descEdit);
+  if (!provs.length) {
+    wrap.innerHTML = '<p style="font-size:12px;color:var(--muted);padding:8px 0">Sin descuentos configurados. Agregá un proveedor.</p>';
+    return;
+  }
+
+  wrap.innerHTML = provs.map(prov => {
+    const rows = descEdit[prov];
+    const rowsHtml = Object.entries(rows).map(([model, amt]) => `
+      <tr data-prov="${prov}" data-model="${model}">
+        <td style="padding:4px 8px;font-size:12px">${model}</td>
+        <td style="padding:4px 8px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:11px;color:var(--muted)">u$</span>
+            <input type="number" min="0" max="999" value="${amt}"
+              style="width:70px;padding:3px 6px;border:1px solid var(--border);border-radius:3px;background:var(--s2);color:var(--text);font-size:12px;font-family:'Space Mono',monospace"
+              onchange="updateDesc('${prov}','${model}',this.value)">
+          </div>
+        </td>
+        <td style="padding:4px 8px">
+          <button onclick="removeDesc('${prov}','${model}')"
+            style="font-size:10px;color:var(--orange);background:transparent;border:1px solid var(--orange);border-radius:3px;padding:1px 6px;cursor:pointer">✕</button>
+        </td>
+      </tr>`).join('');
+
+    // Select para agregar nuevo modelo a este proveedor
+    const existingModels = new Set(Object.keys(rows));
+    const availModels = allModels.filter(m => !existingModels.has(m));
+
+    return `<div style="margin-bottom:16px;background:var(--s1);border:1px solid var(--border);border-radius:6px;overflow:hidden">
+      <div style="padding:8px 12px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+        <span class="pb ${badgeCls(prov)}">${prov}</span>
+        <span style="font-size:11px;color:var(--muted)">${Object.keys(rows).length} modelo(s) con descuento</span>
+        <button onclick="removeDescProv('${prov}')"
+          style="margin-left:auto;font-size:10px;color:var(--muted);background:transparent;border:1px solid var(--border);border-radius:3px;padding:1px 8px;cursor:pointer">Eliminar proveedor</button>
+      </div>
+      ${rowsHtml ? `<table style="width:100%"><thead><tr>
+        <th style="padding:5px 8px;font-size:9px;color:var(--dim);text-transform:uppercase;text-align:left">Modelo</th>
+        <th style="padding:5px 8px;font-size:9px;color:var(--dim);text-transform:uppercase;text-align:left">Descuento USD</th>
+        <th></th>
+      </tr></thead><tbody>${rowsHtml}</tbody></table>` : '<p style="padding:8px 12px;font-size:12px;color:var(--dim)">Sin modelos. Agregá uno abajo.</p>'}
+      <div style="padding:8px 12px;border-top:1px solid var(--border);display:flex;gap:6px;align-items:center">
+        <select id="add-model-${prov}"
+          style="flex:1;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:3px;background:var(--s2);color:var(--text);font-size:12px">
+          <option value="">+ Agregar modelo…</option>
+          ${availModels.map(m=>`<option value="${m}">${m}</option>`).join('')}
+        </select>
+        <button onclick="addDescModel('${prov}')"
+          class="btn btn-g" style="padding:3px 10px;font-size:10px">Agregar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateDesc(prov, model, val) {
+  if (!descEdit[prov]) descEdit[prov] = {};
+  descEdit[prov][model] = Math.max(0, parseInt(val) || 0);
+}
+
+function addDescModel(prov) {
+  const sel = document.getElementById('add-model-' + prov);
+  if (!sel || !sel.value) return;
+  if (!descEdit[prov]) descEdit[prov] = {};
+  descEdit[prov][sel.value] = 0;
+  renderDescEditor();
+}
+
+function removeDesc(prov, model) {
+  if (descEdit[prov]) delete descEdit[prov][model];
+  renderDescEditor();
+}
+
+function removeDescProv(prov) {
+  if (!confirm(`¿Eliminar todos los descuentos de ${prov}?`)) return;
+  delete descEdit[prov];
+  renderDescEditor();
+}
+
+function addDescProv() {
+  const sel = document.getElementById('desc-new-prov');
+  if (!sel || !sel.value) return;
+  const prov = sel.value;
+  if (descEdit[prov]) { alert(`${prov} ya existe en el editor.`); return; }
+  descEdit[prov] = {};
+  sel.value = '';
+  renderDescEditor();
+}
+
+async function saveDescuentos() {
+  const btn = document.getElementById('saveDescBtn');
+  const msg = document.getElementById('desc-msg');
+  btn.disabled = true; btn.textContent = 'Guardando…';
+  try {
+    // Limpiar entradas con monto 0 vacíos (opcional, pero más limpio)
+    const clean = {};
+    for (const [prov, models] of Object.entries(descEdit)) {
+      const filtered = Object.fromEntries(Object.entries(models).filter(([,v])=>v>0));
+      if (Object.keys(filtered).length) clean[prov] = filtered;
+    }
+    await writeDescuentos(clean);
+    DESCUENTOS = clean;
+    descEdit = JSON.parse(JSON.stringify(clean));
+    renderDescEditor();
+    renderAll();
+    msg.innerHTML = `<div class="smsg ok">✓ Descuentos guardados. Se aplican inmediatamente.</div>`;
+  } catch(e) {
+    msg.innerHTML = `<div class="smsg err">✗ ${e.message}</div>`;
+  }
+  btn.disabled = false; btn.textContent = '💾 Guardar descuentos';
+}
+
+// Inicializar editor cuando se abre el tab admin
+const _origShowTab = showTab;
+function showTab(id, btn) {
+  _origShowTab(id, btn);
+  if (id === 'admin' && isAdmin) initDescEditor();
+}
+
 refreshAll();
 </script>
 </body>
