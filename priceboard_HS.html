@@ -1348,10 +1348,10 @@ async function saveDescuentos() {
 
 // Inicializar editor cuando se abre el tab admin
 const _origShowTab = showTab;
-function showTab(id, btn) {
+showTab = function(id, btn) {
   _origShowTab(id, btn);
   if (id === 'admin' && isAdmin) initDescEditor();
-}
+};
 
 refreshAll();
 </script>
