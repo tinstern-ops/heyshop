@@ -393,7 +393,7 @@ tr.best .pv{color:var(--best-text);font-weight:700;}
 const CF_WORKER  = 'https://sweet-thunder-5881.tinstern.workers.dev';
 const GIST_ID    = '5d9214407b592fc64f057d25aaa9cab9';
 const GIST_FILE  = 'priceboard-wa.json';
-const ADMIN_PASS = '@SEBImiaMaia25'; // ← reemplazá antes de subir
+const ADMIN_PASS = 'TU_CLAVE_ADMIN'; // ← reemplazá antes de subir
 
 // Descuentos: se cargan del Gist, estructura { PROVEEDOR: { "Modelo": monto } }
 let DESCUENTOS = {};
@@ -526,16 +526,16 @@ let searchQ = '';
 // CATEGORÍAS
 // ═══════════════════════════════════════
 const CAT_MAP = {
-  iphone: l => l.category === 'iPhone',
-  samsung: l => l.category === 'Samsung',
-  google: l => l.category === 'Google',
-  mac: l => l.category === 'Mac',
-  ipad: l => l.category === 'iPad',
-  watch: l => l.category === 'Watch',
-  airpods: l => l.category === 'AirPods',
-  laptop: l => l.category === 'Laptop',
-  acc: l => l.category === 'Accesorio',
-  usado: l => l.condition === 'used',
+  iphone:  l => l.category === 'iPhone'    && l.condition !== 'used',
+  samsung: l => l.category === 'Samsung'   && l.condition !== 'used',
+  google:  l => l.category === 'Google'    && l.condition !== 'used',
+  mac:     l => l.category === 'Mac'       && l.condition !== 'used',
+  ipad:    l => l.category === 'iPad'      && l.condition !== 'used',
+  watch:   l => l.category === 'Watch'     && l.condition !== 'used',
+  airpods: l => l.category === 'AirPods'   && l.condition !== 'used',
+  laptop:  l => l.category === 'Laptop'    && l.condition !== 'used',
+  acc:     l => l.category === 'Accesorio' && l.condition !== 'used',
+  usado:   l => l.condition === 'used',
 };
 
 // ═══════════════════════════════════════
@@ -1348,10 +1348,10 @@ async function saveDescuentos() {
 
 // Inicializar editor cuando se abre el tab admin
 const _origShowTab = showTab;
-showTab = function(id, btn) {
+function showTab(id, btn) {
   _origShowTab(id, btn);
   if (id === 'admin' && isAdmin) initDescEditor();
-};
+}
 
 refreshAll();
 </script>
