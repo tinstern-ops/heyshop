@@ -1100,6 +1100,7 @@ function showTab(id, btn) {
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
   if(btn) btn.classList.add('on');
   activeTab=id;
+  if (id === 'admin' && isAdmin) initDescEditor();
 }
 // Init: hide all except iphone
 document.querySelectorAll('.sec').forEach((s,i)=>{if(i>0)s.style.display='none';});
@@ -1344,13 +1345,6 @@ async function saveDescuentos() {
     msg.innerHTML = `<div class="smsg err">✗ ${e.message}</div>`;
   }
   btn.disabled = false; btn.textContent = '💾 Guardar descuentos';
-}
-
-// Inicializar editor cuando se abre el tab admin
-const _origShowTab = showTab;
-function showTab(id, btn) {
-  _origShowTab(id, btn);
-  if (id === 'admin' && isAdmin) initDescEditor();
 }
 
 refreshAll();
