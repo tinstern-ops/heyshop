@@ -114,6 +114,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 /* ── TABLE ── */
 table{width:100%;border-collapse:collapse;background:var(--s1);border-radius:8px;overflow:hidden;box-shadow:var(--shadow);font-size:13px;}
 th{background:var(--s2);padding:7px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;}
+th.sortable{cursor:pointer;user-select:none;}
+th.sortable:hover{color:var(--text);}
+th.sort-asc,th.sort-desc{color:var(--accent);}
+.sort-icon{display:inline-block;margin-left:3px;font-size:9px;opacity:.4;}
+th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;}
 td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
 tr.g td{background:var(--group-bg);font-weight:600;font-size:11px;color:var(--group-text);text-transform:uppercase;letter-spacing:.04em;padding:5px 10px;border-top:2px solid var(--border);}
 tr.best td{background:var(--row-best);}
@@ -521,6 +526,41 @@ let GH_TOKEN = '';
 let isAdmin = false;
 let activeTab = 'iphone';
 let searchQ = '';
+
+// Sort state por tab: { col: 'cap'|'price'|'qual'|null, dir: 1|-1 }
+const SORT_STATE = {};
+['iphone','samsung','google','mac','ipad','watch','airpods','laptop','acc','usado'].forEach(t => {
+  SORT_STATE[t] = { col: null, dir: 1 };
+});
+
+function toggleSort(tab, col) {
+  const s = SORT_STATE[tab];
+  if (s.col === col) { s.dir = -s.dir; }
+  else { s.col = col; s.dir = 1; }
+  if (tab === 'usado') renderUsado();
+  else renderCat(tab);
+}
+
+function makeSortFn(tab, defaultFn) {
+  const { col, dir } = SORT_STATE[tab];
+  if (!col) return defaultFn;
+  return (a, b) => {
+    let v = 0;
+    if (col === 'cap')   v = capRank(a.storage) - capRank(b.storage);
+    if (col === 'price') v = (a.price - getDescuento(a.provider,a.model)) - (b.price - getDescuento(b.provider,b.model));
+    if (col === 'qual')  v = (a.quality||'').localeCompare(b.quality||'');
+    if (v !== 0) return v * dir;
+    return (a.price - getDescuento(a.provider,a.model)) - (b.price - getDescuento(b.provider,b.model));
+  };
+}
+
+function thSort(cat, col, label) {
+  const { col: sc, dir } = SORT_STATE[cat];
+  const active = sc === col;
+  const cls = active ? (dir === 1 ? 'sort-asc' : 'sort-desc') : '';
+  const icon = active ? (dir === 1 ? '\u25b2' : '\u25bc') : '\u25b2';
+  return `<th class="sortable ${cls}" onclick="toggleSort('${cat}','${col}')">${label}<span class="sort-icon">${icon}</span></th>`;
+}
 
 // ═══════════════════════════════════════
 // CATEGORÍAS
@@ -939,12 +979,19 @@ function renderCatTable(cat, data, keyFn, sortFn, cols) {
     return;
   }
 
-  const thHtml=cols.map(c=>`<th>${c}</th>`).join('');
+  // Headers con sort clickeable en Cap. y Precio
+  const thHtml=cols.map(c=>{
+    if (c==='Cap.')   return thSort(cat,'cap','Cap.');
+    if (c==='Precio') return thSort(cat,'price','Precio');
+    return `<th>${c}</th>`;
+  }).join('');
   let html=`<table><thead><tr><th style="width:14px"></th>${thHtml}</tr></thead><tbody>`;
+
+  const activeSortFn = makeSortFn(cat, sortFn);
 
   models.forEach(model=>{
     const rows=data.filter(l=>l.model===model);
-    rows.sort(sortFn);
+    rows.sort(activeSortFn);
     html+=`<tr class="g"><td colspan="${cols.length+1}">${model}</td></tr>`;
     rows.forEach(l=>{
       const k=keyFn(l);
@@ -1009,18 +1056,26 @@ function renderUsado() {
     return;
   }
 
+  const usadoDefaultSort = (a,b) => {
+    if (a.storage !== b.storage) return capRank(a.storage) - capRank(b.storage);
+    return a.price - b.price;
+  };
+  const usadoSortFn = makeSortFn('usado', usadoDefaultSort);
+
   let html = `<table><thead><tr>
-    <th style="width:14px"></th><th>Modelo</th><th>Cap.</th>
-    <th>Proveedor</th><th>Precio</th><th>vs mejor</th>
-    <th>Batería</th><th>Calidad</th><th>Nota</th>
+    <th style="width:14px"></th><th>Modelo</th>
+    ${thSort('usado','cap','Cap.')}
+    <th>Proveedor</th>
+    ${thSort('usado','price','Precio')}
+    <th>vs mejor</th>
+    <th>Batería</th>
+    ${thSort('usado','qual','Calidad')}
+    <th>Nota</th>
   </tr></thead><tbody>`;
 
   models.forEach(model => {
     const rows = data.filter(l => l.model === model);
-    rows.sort((a,b) => {
-      if (a.storage !== b.storage) return capRank(a.storage) - capRank(b.storage);
-      return a.price - b.price;
-    });
+    rows.sort(usadoSortFn);
     html += `<tr class="g"><td colspan="9">${model}</td></tr>`;
     rows.forEach(l => {
       const k = l.model+'|'+l.storage;
